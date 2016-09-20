@@ -1,12 +1,4 @@
-aclocal.m4
-config.*
-configure
-depcomp
-install-sh
-Makefile
-Makefile.in
-missing
-.autotools
-.cproject
-.project
-.settings
+_site
+.sass-cache
+.jekyll-metadata
+_site
