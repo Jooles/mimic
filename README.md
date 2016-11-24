@@ -11,6 +11,4 @@ I have no expectations that this will work or that it'll be good, but it's an ed
 ### Prerequisites
 * C++ compiler that supports --std=c++14 (CI builds performed with GCC 5, clang 3.6 and 3.7)
 * libpthread (for tests)
-* Doxygen (optional - if generated documentation is required)
-* pdflatex (optional - if pdf documentation is required)
-* Dot (optional - if diagrams in documentation are required)
+
