@@ -12,3 +12,5 @@ I have no expectations that this will work or that it'll be good, but it's an ed
 * C++ compiler that supports --std=c++14 (CI builds performed with GCC 5, clang 3.6 and 3.7)
 * libpthread (for tests)
 
+### Credit
+Oracle and Java are registered trademarks of Oracle and/or its affiliates. Other names may be trademarks of their respective owners.
