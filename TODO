@@ -1,0 +1,9 @@
+* Parse class files
+  - Read all class file data into relevant data structures
+  - Ensure class file is correct length (no trailing bytes and no truncation)
+  * Validate constant pool entries
+  * Read attributes into distinct attribute
+  * Validate lengths of known attributes
+  * Validate field and method references
+* Use precompiled headers
+* Rework autoconf scripts to work with clang and gcc

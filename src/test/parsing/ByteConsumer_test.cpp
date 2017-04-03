@@ -8,16 +8,16 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "parsing/ByteConsumer.h"
-//#include "parsing/ParseFailureException.h"
 
-namespace parsing {
+namespace parsing
+{
 
-class ByteConsumerTest : public testing::Test
+class ByteConsumerTest: public testing::Test
 {
 
 protected:
-	ByteConsumerTest()
-	: bc(ss)
+	ByteConsumerTest() :
+			bc(ss, 10)
 	{
 		for (uint8_t i = 1; i <= 10; i++)
 		{
@@ -38,19 +38,34 @@ private:
 TEST_F(ByteConsumerTest, TestReadU1)
 {
 	// 0x01
+	EXPECT_EQ(10, bc.bytesRemaining());
 	EXPECT_EQ(1, bc.readU1());
+	EXPECT_EQ(9, bc.bytesRemaining());
 }
 
 TEST_F(ByteConsumerTest, TestReadU2)
 {
 	// 0x0102
+	EXPECT_EQ(10, bc.bytesRemaining());
 	EXPECT_EQ(258, bc.readU2());
+	EXPECT_EQ(8, bc.bytesRemaining());
 }
 
 TEST_F(ByteConsumerTest, TestReadU4)
 {
 	// 0x01020304
+	EXPECT_EQ(10, bc.bytesRemaining());
 	EXPECT_EQ(16909060, bc.readU4());
+	EXPECT_EQ(6, bc.bytesRemaining());
+}
+
+TEST_F(ByteConsumerTest, TestReadBytes)
+{
+	EXPECT_EQ(10, bc.bytesRemaining());
+	std::vector<uint8_t> expected =
+	{ 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
+	EXPECT_EQ(expected, bc.readBytes(10));
+	EXPECT_EQ(0, bc.bytesRemaining());
 }
 
 TEST_F(ByteConsumerTest, TestReadConsecutiveU1)
@@ -82,18 +97,78 @@ TEST_F(ByteConsumerTest, TestReadConsecutiveU4)
 	EXPECT_EQ(84281096, bc.readU4());
 }
 
-/*TEST_F(ByteConsumerTest, TestReadPastEndOfStream)
+TEST_F(ByteConsumerTest, TestReadBytesConsecutive)
 {
-	bc.readU4();
-	bc.readU4();
-	ASSERT_THROW(bc.readU4(), parse_failure_exception);
+	std::vector<uint8_t> expected1 =
+	{ 0x01, 0x02, 0x03, 0x04 };
+	std::vector<uint8_t> expected2 =
+	{ 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
+	EXPECT_EQ(expected1, bc.readBytes(4));
+	EXPECT_EQ(expected2, bc.readBytes(6));
 }
 
-TEST_F(ByteConsumerTest, TestReadEmptyStream)
+TEST_F(ByteConsumerTest, TestReadPastEndOfStreamU1)
+{
+	EXPECT_EQ(10, bc.bytesRemaining());
+	for (int i = 0; i < 10; i++)
+	{
+		bc.readU1();
+	}
+	EXPECT_EQ(0, bc.bytesRemaining());
+	ASSERT_THROW(bc.readU1(), parse_failure);
+}
+
+TEST_F(ByteConsumerTest, TestReadPastEndOfStreamU2)
+{
+	EXPECT_EQ(10, bc.bytesRemaining());
+	for (int i = 0; i < 5; i++)
+	{
+		bc.readU2();
+	}
+	EXPECT_EQ(0, bc.bytesRemaining());
+	ASSERT_THROW(bc.readU2(), parse_failure);
+}
+
+TEST_F(ByteConsumerTest, TestReadPastEndOfStreamU4)
+{
+	EXPECT_EQ(10, bc.bytesRemaining());
+	bc.readU4();
+	bc.readU4();
+	EXPECT_EQ(2, bc.bytesRemaining());
+	ASSERT_THROW(bc.readU4(), parse_failure);
+}
+
+TEST_F(ByteConsumerTest, TestReadPastEndOfStreamBytes)
+{
+	ASSERT_THROW(bc.readBytes(11), parse_failure);
+}
+
+TEST_F(ByteConsumerTest, TestReadEmptyStreamU1)
 {
 	std::stringstream ss2;
 	ByteConsumer bc2(ss2);
-	ASSERT_THROW(bc2.readU1(), parse_failure_exception);
-}*/
+	ASSERT_THROW(bc2.readU1(), parse_failure);
+}
+
+TEST_F(ByteConsumerTest, TestReadEmptyStreamU2)
+{
+	std::stringstream ss2;
+	ByteConsumer bc2(ss2);
+	ASSERT_THROW(bc2.readU2(), parse_failure);
+}
+
+TEST_F(ByteConsumerTest, TestReadEmptyStreamU4)
+{
+	std::stringstream ss2;
+	ByteConsumer bc2(ss2);
+	ASSERT_THROW(bc2.readU2(), parse_failure);
+}
+
+TEST_F(ByteConsumerTest, TestReadEmptyStreamBytes)
+{
+	std::stringstream ss2;
+	ByteConsumer bc2(ss2);
+	ASSERT_THROW(bc2.readBytes(1), parse_failure);
+}
 
 } /* namespace parsing */

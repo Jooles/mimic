@@ -2,6 +2,7 @@
 *.deps
 *.dirstamp
 *.o
+*.swp
 *.tag
 *.tar.gz
 .autotools
