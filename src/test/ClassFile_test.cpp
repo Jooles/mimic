@@ -6,8 +6,10 @@
  */
 #ifdef HAVE_CXX_FILESYSTEM
 #include <filesystem>
+namespace fs = std::filesystem;
 #elif defined(HAVE_CXX_EXPERIMENTAL_FILESYSTEM)
 #include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 #endif
 #include <fstream>
 #include <sstream>
@@ -16,8 +18,6 @@
 #include "ClassFile.h"
 #include "parsing/ByteConsumer.h"
 #include "parsing/ParseFailureException.h"
-
-namespace fs = std::experimental::filesystem;
 
 namespace mimic
 {
