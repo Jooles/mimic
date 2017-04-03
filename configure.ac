@@ -7,11 +7,18 @@ AC_INIT(Mimic, 0.1)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([foreign])
 
+AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_PROG_RANLIB
 
 m4_include([m4/ax_cxx_compile_stdcxx.m4])
 AX_CXX_COMPILE_STDCXX(14, noext, mandatory)
+
+#AC_CHECK_HEADERS_ONCE([experimental/filesystem filesystem])
+m4_include([m4/ax_cxx_have_filesystem.m4])
+AX_CXX_HAVE_FILESYSTEM
+
+AC_CHECK_LIB(stdc++fs, main)
 
 AC_CONFIG_FILES(Makefile)
 AC_OUTPUT

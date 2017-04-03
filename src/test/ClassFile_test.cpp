@@ -4,8 +4,11 @@
  *  Created on: 23 Nov 2016
  *      Author: Julian Cromarty
  */
-
+#ifdef HAVE_CXX_FILESYSTEM
+#include <filesystem>
+#elif defined(HAVE_CXX_EXPERIMENTAL_FILESYSTEM)
 #include <experimental/filesystem>
+#endif
 #include <fstream>
 #include <sstream>
 #include "gtest/gtest.h"
