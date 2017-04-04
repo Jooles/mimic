@@ -200,7 +200,7 @@ class ConstantPool
 public:
 	ConstantPool() {
 		// Set pool[0] to an invalid entry as 0 is an invalid index
-		std::shared_ptr<constant_pool::Info> invalid = std::make_shared<constant_pool::Info>(-1);
+		constant_pool::Info invalid(-1);
 		pool.push_back(invalid);
 	};
 	/**
@@ -214,9 +214,23 @@ public:
 	 * @param index the index of the constant pool entry to get
 	 * @return the constant pool entry at the specified index
 	 */
-	template <typename T> std::shared_ptr<T> get(const u2 index);
+	template <typename T> T& get(const u2 index);
 private:
-	std::vector<std::shared_ptr<constant_pool::Info>> pool;
+	std::vector<variant<constant_pool::Info,
+                      constant_pool::Class_info,
+                      constant_pool::Double_info,
+                      constant_pool::Fieldref_info,
+                      constant_pool::Float_info,
+                      constant_pool::Integer_info,
+                      constant_pool::InterfaceMethodref_info,
+                      constant_pool::InvokeDynamic_info,
+                      constant_pool::Long_info,
+                      constant_pool::MethodHandle_info,
+                      constant_pool::MethodType_info,
+                      constant_pool::Methodref_info,
+                      constant_pool::NameAndType_info,
+                      constant_pool::String_info,
+                      constant_pool::Utf8_info>> pool;
 	
 	void assertTag(const u1 tag, const std::shared_ptr<constant_pool::Info> info);
 };

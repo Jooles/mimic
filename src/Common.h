@@ -14,6 +14,12 @@
 #elif defined(HAVE_CXX_EXPERIMENTAL_FILESYSTEM)
 #include <experimental/filesystem>
 #endif
+#ifdef HAVE_CXX_VARIANT
+#include <variant>
+#else
+#include <boost/variant.hpp>
+#endif
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -26,6 +32,11 @@ namespace mimic
 namespace fs = std::filesystem;
 #elif defined(HAVE_CXX_EXPERIMENTAL_FILESYSTEM)
 namespace fs = std::experimental::filesystem;
+#endif
+#ifdef HAVE_CXX_VARIANT
+using std::variant;
+#else
+using boost::variant;
 #endif
 
 /*

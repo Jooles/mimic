@@ -7,17 +7,21 @@ matrix:
       addons:
         apt:
           sources:
+            - boost-latest
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - libboost1.55-all-dev
       env: COMPILER=g++-5
     - compiler: gcc-6
       addons:
         apt:
           sources:
+            - boost-latest
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
+            - libboost1.55-all-dev
       env: COMPILER=g++-6
 
 before_script:

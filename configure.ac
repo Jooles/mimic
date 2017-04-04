@@ -14,9 +14,13 @@ AC_PROG_RANLIB
 m4_include([m4/ax_cxx_compile_stdcxx.m4])
 AX_CXX_COMPILE_STDCXX(14, noext, mandatory)
 
-#AC_CHECK_HEADERS_ONCE([experimental/filesystem filesystem])
 m4_include([m4/ax_cxx_have_filesystem.m4])
 AX_CXX_HAVE_FILESYSTEM
+m4_include([m4/ax_cxx_have_variant.m4])
+AX_CXX_HAVE_VARIANT
+
+m4_include([m4/ax_boost_base.m4])
+AX_BOOST_BASE([1.52])
 
 AC_CHECK_LIB(stdc++fs, main)
 
