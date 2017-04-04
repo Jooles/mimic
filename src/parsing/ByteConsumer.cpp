@@ -8,6 +8,8 @@
 #include "ByteConsumer.h"
 #include <type_traits>
 
+namespace mimic
+{
 namespace parsing
 {
 
@@ -74,4 +76,6 @@ std::vector<uint8_t> ByteConsumer::readBytes(int numberOfBytes)
 	return bytes;
 }
 
-} /* namespace parsing */
+}
+}
+

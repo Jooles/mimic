@@ -5,12 +5,11 @@
  *      Author: Julian Cromarty
  */
 
-#ifndef SRC_JAVA_CONSTANTPOOL_H_
-#define SRC_JAVA_CONSTANTPOOL_H_
+#ifndef SRC_MIMIC_CONSTANTPOOL_H_
+#define SRC_MIMIC_CONSTANTPOOL_H_
 
-#include <memory>
-#include <vector>
 #include "Common.h"
+#include "parsing/ByteConsumer.h"
 
 namespace mimic
 {
@@ -51,6 +50,7 @@ const u1 InvokeDynamic = 18;
 typedef struct Info
 {
 	Info(const u1& tag) : tag(tag) {}
+	virtual ~Info() {};
 	u1 tag;
 } Info;
 
@@ -198,14 +198,23 @@ typedef struct InvokeDynamic_info : Info
 class ConstantPool
 {
 public:
-	ConstantPool() {};
-	ConstantPool(std::vector<std::shared_ptr<constant_pool::Info>>& pool) : pool(pool) {};
-	ConstantPool(std::vector<std::shared_ptr<constant_pool::Info>>&& pool) : pool(pool) {};
+	ConstantPool() {
+		// Set pool[0] to an invalid entry as 0 is an invalid index
+		std::shared_ptr<constant_pool::Info> invalid = std::make_shared<constant_pool::Info>(-1);
+		pool.push_back(invalid);
+	};
+	/**
+	 * Parses the constant pool entries from a ByteConsumer
+	 *
+	 * @param the ByteConsumer to use
+	 * @param the number of constant pool entries
+	 */
+	ConstantPool(parsing::ByteConsumer&, u2);
 	/**
 	 * @param index the index of the constant pool entry to get
 	 * @return the constant pool entry at the specified index
 	 */
-	template <typename T> auto get(const u2 index);
+	template <typename T> std::shared_ptr<T> get(const u2 index);
 private:
 	std::vector<std::shared_ptr<constant_pool::Info>> pool;
 	
@@ -214,4 +223,4 @@ private:
 
 }
 
-#endif /* SRC_JAVA_CONSTANTPOOL_H_ */
+#endif /* SRC_MIMIC_CONSTANTPOOL_H_ */

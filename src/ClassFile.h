@@ -5,11 +5,8 @@
  *      Author: Julian Cromarty
  */
 
-#ifndef SRC_CLASSFILE_H_
-#define SRC_CLASSFILE_H_
-
-#include <memory>
-#include <vector>
+#ifndef SRC_MIMIC_CLASSFILE_H_
+#define SRC_MIMIC_CLASSFILE_H_
 
 #include "Common.h"
 #include "ConstantPool.h"
@@ -95,4 +92,4 @@ public:
 
 }
 
-#endif /* SRC_CLASSFILE_H_ */
+#endif /* SRC_MIMIC_CLASSFILE_H_ */

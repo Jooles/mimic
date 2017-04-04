@@ -9,11 +9,11 @@
 #define SRC_PARSING_BYTECONSUMER_H_
 
 #include <istream>
-#include <memory>
-#include <vector>
 #include "Common.h"
 #include "ParseFailureException.h"
 
+namespace mimic
+{
 namespace parsing
 {
 
@@ -81,6 +81,7 @@ private:
 	uintmax_t bytesRemainingCount;
 };
 
-} /* namespace parsing */
+}
+}
 
 #endif /* SRC_PARSING_BYTECONSUMER_H_ */

@@ -1,7 +1,7 @@
 /**
- * \file ByteConsumer_test.cpp
+ * \file ClassFile_test.cpp
  *
- *  Created on: 23 Nov 2016
+ *  Created on: 02 Apr 2017
  *      Author: Julian Cromarty
  */
 #ifdef HAVE_CXX_FILESYSTEM
@@ -58,4 +58,4 @@ TEST_F(ClassFileTest, TestHelloWorld)
 	ASSERT_EQ(0, clazz.getMinorVersion());
 }
 
-} /* namespace parsing */
+}

@@ -9,7 +9,8 @@
 #define SRC_PARSING_PARSEFAILUREEXCEPTION_H_
 
 #include <exception>
-
+namespace mimic
+{
 namespace parsing
 {
 
@@ -44,6 +45,7 @@ public:
 	}
 };
 
-} /* namespace parsing */
+}
+}
 
 #endif /* SRC_PARSING_PARSEFAILUREEXCEPTION_H_ */

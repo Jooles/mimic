@@ -9,6 +9,8 @@
 #include "gmock/gmock.h"
 #include "parsing/ByteConsumer.h"
 
+namespace mimic
+{
 namespace parsing
 {
 
@@ -171,4 +173,6 @@ TEST_F(ByteConsumerTest, TestReadEmptyStreamBytes)
 	ASSERT_THROW(bc2.readBytes(1), parse_failure);
 }
 
-} /* namespace parsing */
+}
+}
+
