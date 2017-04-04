@@ -239,7 +239,7 @@
 // portability utilities to Google Test's gtest-port.h instead of
 // here, as Google Mock depends on Google Test.  Only add a utility
 // here if it's truly specific to Google Mock.
-#include "gtest/gtest.h"
+#include "test/gtest/gtest.h"
 // Copyright 2015, Google Inc.
 // All rights reserved.
 //

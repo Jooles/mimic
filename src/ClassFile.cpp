@@ -5,10 +5,8 @@
  *      Author: Julian Cromarty
  */
 
-#include <ClassFile.h>
-#include <fstream>
-#include <iostream>
-#include <parsing/ByteConsumer.h>
+#include "ClassFile.h"
+#include "parsing/ByteConsumer.h"
 
 namespace mimic
 {

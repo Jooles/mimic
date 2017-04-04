@@ -9,13 +9,24 @@
 #define SRC_MIMIC_COMMON_H_
 
 #include <cstdint>
+#ifdef HAVE_CXX_FILESYSTEM
+#include <filesystem>
+#elif defined(HAVE_CXX_EXPERIMENTAL_FILESYSTEM)
+#include <experimental/filesystem>
+#endif
 #include <iomanip>
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <vector>
 
 namespace mimic
 {
+#ifdef HAVE_CXX_FILESYSTEM
+namespace fs = std::filesystem;
+#elif defined(HAVE_CXX_EXPERIMENTAL_FILESYSTEM)
+namespace fs = std::experimental::filesystem;
+#endif
 
 /*
  * Common definitions used in many places

@@ -5,8 +5,7 @@
  *      Author: Julian Cromarty
  */
 
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
+#include "test/TestCommon.h"
 #include "parsing/ByteConsumer.h"
 
 namespace mimic

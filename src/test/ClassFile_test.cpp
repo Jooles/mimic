@@ -4,17 +4,8 @@
  *  Created on: 02 Apr 2017
  *      Author: Julian Cromarty
  */
-#ifdef HAVE_CXX_FILESYSTEM
-#include <filesystem>
-namespace fs = std::filesystem;
-#elif defined(HAVE_CXX_EXPERIMENTAL_FILESYSTEM)
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#endif
-#include <fstream>
-#include <sstream>
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
+
+#include "test/TestCommon.h"
 #include "ClassFile.h"
 #include "parsing/ByteConsumer.h"
 #include "parsing/ParseFailureException.h"

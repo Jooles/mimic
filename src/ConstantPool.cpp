@@ -6,7 +6,6 @@
  */
 
 #include "ConstantPool.h"
-#include <iostream>
 
 namespace mimic
 {
