@@ -1,23 +1,23 @@
 
-#include "Utf8String.h"
+#include "JUtf8String.h"
 #include "parsing/ParseFailureException.h"
 
 namespace mimic
 {
 
-Utf8String::Utf8String(std::vector<u1>& bytes, u2 length)
+JUtf8String::JUtf8String(std::vector<u1>& bytes, u2 length)
 	: bytes(bytes)
 {
   checkString(length);
 };
 
-Utf8String::Utf8String(std::vector<u1>&& bytes, u2 length)
+JUtf8String::JUtf8String(std::vector<u1>&& bytes, u2 length)
 	: bytes(bytes)
 {
   checkString(length);
 };
 
-void Utf8String::checkString(u2& numberOfBytes)
+void JUtf8String::checkString(u2& numberOfBytes)
 {
   if (numberOfBytes != bytes.size())
     throw parsing::parse_failure("Wrong length");
@@ -32,7 +32,7 @@ void Utf8String::checkString(u2& numberOfBytes)
   }
 }
 
-u2 Utf8String::length() const
+u2 JUtf8String::length() const
 {
   u2 length = 0;
   for (auto i = bytes.begin(); i < bytes.end(); nextIndex(i))
@@ -42,7 +42,7 @@ u2 Utf8String::length() const
   return length;
 }
 
-void Utf8String::nextIndex(std::vector<u1>::const_iterator& index) const
+void JUtf8String::nextIndex(std::vector<u1>::const_iterator& index) const
 {
   u1 byte = *index;
   if (byte == 0xed)
@@ -63,7 +63,7 @@ void Utf8String::nextIndex(std::vector<u1>::const_iterator& index) const
   }
 }
 
-u4 Utf8String::get(std::vector<u1>::const_iterator& index) const
+u4 JUtf8String::get(std::vector<u1>::const_iterator& index) const
 {
   u4 code_point;
   if (*index == 0xed)
@@ -91,7 +91,7 @@ u4 Utf8String::get(std::vector<u1>::const_iterator& index) const
   return code_point;
 }
 
-void Utf8String::put(const std::vector<u1>::iterator& index, u4 code_point)
+void JUtf8String::put(const std::vector<u1>::iterator& index, u4 code_point)
 {
   std::vector<u1> code_point_bytes;
   if (code_point > 0xffff)
@@ -129,7 +129,7 @@ void Utf8String::put(const std::vector<u1>::iterator& index, u4 code_point)
   replace(index, code_point_bytes);
 }
 
-void Utf8String::replace(const std::vector<u1>::iterator& index, std::vector<u1> code_point_bytes)
+void JUtf8String::replace(const std::vector<u1>::iterator& index, std::vector<u1> code_point_bytes)
 {
   if (index < bytes.end())
   {

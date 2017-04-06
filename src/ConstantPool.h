@@ -9,7 +9,7 @@
 #define SRC_MIMIC_CONSTANTPOOL_H_
 
 #include "Common.h"
-#include "Utf8String.h"
+#include "JUtf8String.h"
 #include "parsing/ByteConsumer.h"
 
 namespace mimic
@@ -158,7 +158,7 @@ typedef struct Utf8_info : Info
 	Utf8_info(u2 length, std::vector<u1> bytes)
 	: Info(Utf8), str(bytes, length) {
 	}
-	Utf8String str;
+	JUtf8String str;
 } Utf8_info;
 
 /** Representation of a Method Handle entry in the constant pool. */
