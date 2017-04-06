@@ -9,6 +9,7 @@
 #define SRC_MIMIC_CONSTANTPOOL_H_
 
 #include "Common.h"
+#include "Utf8String.h"
 #include "parsing/ByteConsumer.h"
 
 namespace mimic
@@ -155,10 +156,9 @@ typedef struct NameAndType_info : Info
 typedef struct Utf8_info : Info
 {
 	Utf8_info(u2 length, std::vector<u1> bytes)
-	: Info(Utf8), length(length), bytes(bytes) {
+	: Info(Utf8), str(bytes, length) {
 	}
-	u2 length;
-	std::vector<u1> bytes;
+	Utf8String str;
 } Utf8_info;
 
 /** Representation of a Method Handle entry in the constant pool. */
@@ -216,21 +216,22 @@ public:
 	 */
 	template <typename T> T& get(const u2 index);
 private:
-	std::vector<variant<constant_pool::Info,
-                      constant_pool::Class_info,
-                      constant_pool::Double_info,
-                      constant_pool::Fieldref_info,
-                      constant_pool::Float_info,
-                      constant_pool::Integer_info,
-                      constant_pool::InterfaceMethodref_info,
-                      constant_pool::InvokeDynamic_info,
-                      constant_pool::Long_info,
-                      constant_pool::MethodHandle_info,
-                      constant_pool::MethodType_info,
-                      constant_pool::Methodref_info,
-                      constant_pool::NameAndType_info,
-                      constant_pool::String_info,
-                      constant_pool::Utf8_info>> pool;
+  typedef variant<constant_pool::Info,
+                  constant_pool::Class_info,
+                  constant_pool::Double_info,
+                  constant_pool::Fieldref_info,
+                  constant_pool::Float_info,
+                  constant_pool::Integer_info,
+                  constant_pool::InterfaceMethodref_info,
+                  constant_pool::InvokeDynamic_info,
+                  constant_pool::Long_info,
+                  constant_pool::MethodHandle_info,
+                  constant_pool::MethodType_info,
+                  constant_pool::Methodref_info,
+                  constant_pool::NameAndType_info,
+                  constant_pool::String_info,
+                  constant_pool::Utf8_info> cp_type;
+	std::vector<cp_type> pool;
 	
 	void assertTag(const u1 tag, const std::shared_ptr<constant_pool::Info> info);
 };

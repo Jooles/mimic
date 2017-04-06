@@ -1,10 +1,11 @@
 * Parse class files
   - Read all class file data into relevant data structures
   - Ensure class file is correct length (no trailing bytes and no truncation)
-  * Write ModifiedUtf8 class and use it in constant_poot::Utf8_info
+  - Write Utf8string class and use it in constant_poot::Utf8_info
   * Validate constant pool entries
   * Read attributes into distinct attribute
   * Validate lengths of known attributes
   * Validate field and method references
-* Use precompiled headers
-* Rework autoconf scripts to work with clang and gcc
+  * Rewrite Utf8string class to use a custom codecvt to avoid the need to use
+    an intermediate code point value when converting to/from UTF-8
+  * Add UTF-16 conversions to Utf8string class
