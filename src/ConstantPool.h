@@ -232,6 +232,7 @@ private:
                   constant_pool::String_info,
                   constant_pool::Utf8_info> cp_type;
 	std::vector<cp_type> pool;
+  static constant_pool::Info INVALID;
 	
 	void assertTag(const u1 tag, const std::shared_ptr<constant_pool::Info> info);
 };
