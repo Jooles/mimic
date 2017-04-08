@@ -30,14 +30,14 @@ protected:
 TEST_F(JUtf8StringTest, TestNullByteThrowsOnConstruction)
 {
 	std::vector<u1> bytes = { 0x00 };
-	ASSERT_THROW(JUtf8String(bytes, 1), parsing::parse_failure);
+	ASSERT_THROW(JUtf8String{bytes}, parsing::parse_failure);
 }
 
 TEST_F(JUtf8StringTest, TestByteInInvalidRangeThrowsOnConstruction)
 {
 	for (int i = 0xf0; i <= 0xff; i++) {
     std::vector<u1> bytes = { (u1) i };
-    ASSERT_THROW(JUtf8String(bytes, 1), parsing::parse_failure) << "Expected char " << std::setw(2) << std::hex << i << std::dec << " to throw";
+    ASSERT_THROW(JUtf8String{bytes}, parsing::parse_failure);
   }
 }
 
@@ -45,7 +45,7 @@ TEST_F(JUtf8StringTest, TestOneByteCharacterGivesLength1)
 {
 	for (u1 i = 0x01; i < 0x80; i++) {
     std::vector<u1> bytes = { (u1) i };
-    ASSERT_EQ(1, JUtf8String(bytes, 1).length()) << "When checking char /U" << std::hex << std::setfill('0') << std::setw(4) << (int)i << std::dec;
+    ASSERT_EQ(1, JUtf8String(bytes).length()) << "When checking char /U" << std::hex << std::setfill('0') << std::setw(4) << (int)i << std::dec;
   }
 }
 
@@ -56,15 +56,15 @@ TEST_F(JUtf8StringTest, TestTwoByteCharacterGivesLength1)
     u1 byte2 = (i & 0x3f) | 0x80;
     std::vector<u1> bytes = { byte1, byte2 };
     ASSERT_EQ(2, bytes.size());
-    ASSERT_EQ(1, JUtf8String(bytes, 2).length()) << "When checking char /U"
-                                                << std::hex
-                                                << std::setfill('0')
-                                                << std::setw(4)
-                                                << (int)i
-                                                << ", bytes: "
-                                                << std::setw(2) << (int)byte1 << ", "
-                                                << std::setw(2) << (int)byte2
-                                                << std::dec;
+    ASSERT_EQ(1, JUtf8String(bytes).length()) << "When checking char /U"
+                                              << std::hex
+                                              << std::setfill('0')
+                                              << std::setw(4)
+                                              << (int)i
+                                              << ", bytes: "
+                                              << std::setw(2) << (int)byte1 << ", "
+                                              << std::setw(2) << (int)byte2
+                                              << std::dec;
   }
 }
 
@@ -76,16 +76,16 @@ TEST_F(JUtf8StringTest, TestThreeByteCharacterGivesLength1)
     u1 byte3 = (i & 0x3f) | 0x80;
     std::vector<u1> bytes = { byte1, byte2, byte3 };
     ASSERT_EQ(3, bytes.size());
-    ASSERT_EQ(1, JUtf8String(bytes, 3).length()) << "When checking char /U"
-                                                << std::hex
-                                                << std::setfill('0')
-                                                << std::setw(4)
-                                                << (int)i
-                                                << ", bytes: "
-                                                << std::setw(2) << (int)byte1 << ", "
-                                                << std::setw(2) << (int)byte2 << ", "
-                                                << std::setw(2) << (int)byte3
-                                                << std::dec;
+    ASSERT_EQ(1, JUtf8String(bytes).length()) << "When checking char /U"
+                                              << std::hex
+                                              << std::setfill('0')
+                                              << std::setw(4)
+                                              << (int)i
+                                              << ", bytes: "
+                                              << std::setw(2) << (int)byte1 << ", "
+                                              << std::setw(2) << (int)byte2 << ", "
+                                              << std::setw(2) << (int)byte3
+                                              << std::dec;
   }
 }
 
@@ -100,23 +100,23 @@ TEST_F(JUtf8StringTest, Test6ByteCharacterGivesLength1)
     u1 byte6 = (i & 0x3f) | 0x80;
     std::vector<u1> bytes = { byte1, byte2, byte3 };
     ASSERT_EQ(3, bytes.size());
-    ASSERT_EQ(1, JUtf8String(bytes, 3).length()) << "When checking char /U"
-                                                << std::hex
-                                                << std::setfill('0')
-                                                << std::setw(4)
-                                                << (int)i
-                                                << ", bytes: "
-                                                << std::setw(2) << (int)byte1 << ", "
-                                                << std::setw(2) << (int)byte2 << ", "
-                                                << std::setw(2) << (int)byte3
-                                                << std::dec;
+    ASSERT_EQ(1, JUtf8String(bytes).length()) << "When checking char /U"
+                                              << std::hex
+                                              << std::setfill('0')
+                                              << std::setw(4)
+                                              << (int)i
+                                              << ", bytes: "
+                                              << std::setw(2) << (int)byte1 << ", "
+                                              << std::setw(2) << (int)byte2 << ", "
+                                              << std::setw(2) << (int)byte3
+                                              << std::dec;
   }
 }
 
 TEST_F(JUtf8StringTest, TestOstream1ByteCharacter)
 {
   std::vector<u1> bytes = { 0x36 };
-  JUtf8String str(bytes, 1);
+  JUtf8String str(bytes);
   std::stringstream ss;
   ss << str;
   ASSERT_STREQ(std::string("6").c_str(), ss.str().c_str());
@@ -125,7 +125,7 @@ TEST_F(JUtf8StringTest, TestOstream1ByteCharacter)
 TEST_F(JUtf8StringTest, TestOstream2ByteCharacter)
 {
   std::vector<u1> bytes = { 0xc4, 0xb6 };
-  JUtf8String str(bytes, 2);
+  JUtf8String str(bytes);
   std::stringstream ss;
   ss << str;
   ASSERT_STREQ(std::string("Ķ").c_str(), ss.str().c_str());
@@ -134,7 +134,7 @@ TEST_F(JUtf8StringTest, TestOstream2ByteCharacter)
 TEST_F(JUtf8StringTest, TestOstreamSingleNullCharacter)
 {
   std::vector<u1> bytes = { 0xc0, 0x80 };
-  JUtf8String str(bytes, 2);
+  JUtf8String str(bytes);
   std::stringstream ss;
   ss << str;
   ASSERT_STREQ(std::string("\0").c_str(), ss.str().c_str());
@@ -143,7 +143,7 @@ TEST_F(JUtf8StringTest, TestOstreamSingleNullCharacter)
 TEST_F(JUtf8StringTest, TestOstreamEmbeddedNullCharacter)
 {
   std::vector<u1> bytes = { 0x41, 0xc0, 0x80, 0x42 };
-  JUtf8String str(bytes, 4);
+  JUtf8String str(bytes);
   std::stringstream ss;
   ss << str;
   ASSERT_STREQ(std::string("A\0B").c_str(), ss.str().c_str());
@@ -152,7 +152,7 @@ TEST_F(JUtf8StringTest, TestOstreamEmbeddedNullCharacter)
 TEST_F(JUtf8StringTest, TestOstream3ByteCharacter)
 {
   std::vector<u1> bytes = { 0xe2, 0x80, 0xb9 };
-  JUtf8String str(bytes, 3);
+  JUtf8String str(bytes);
   std::stringstream ss;
   ss << str;
   ASSERT_STREQ(std::string("‹").c_str(), ss.str().c_str());
@@ -161,7 +161,7 @@ TEST_F(JUtf8StringTest, TestOstream3ByteCharacter)
 TEST_F(JUtf8StringTest, TestOstream6ByteCharacter)
 {
   std::vector<u1> bytes = { 0xed, 0xa1, 0x80, 0xed, 0xbc, 0x8a };
-  JUtf8String str(bytes, 6);
+  JUtf8String str(bytes);
   std::stringstream ss;
   ss << str;
   ASSERT_STREQ(std::string("𐌊").c_str(), ss.str().c_str());
@@ -170,7 +170,7 @@ TEST_F(JUtf8StringTest, TestOstream6ByteCharacter)
 TEST_F(JUtf8StringTest, TestOstream6ByteCharacterOverU10fff)
 {
   std::vector<u1> bytes = { 0xed, 0xa2, 0x80, 0xed, 0xb1, 0xa8 };
-  JUtf8String str(bytes, 6);
+  JUtf8String str(bytes);
   std::stringstream ss;
   ss << str;
   ASSERT_STREQ(std::string("𠁨").c_str(), ss.str().c_str());
@@ -179,49 +179,70 @@ TEST_F(JUtf8StringTest, TestOstream6ByteCharacterOverU10fff)
 TEST_F(JUtf8StringTest, TestConstructFromString1ByteCharacter)
 {
   std::vector<u1> bytes = { 0x36 };
-  JUtf8String str("6");
+  JUtf8String str;
+  std::stringstream ss;
+  ss << std::string("6");
+  ss >> str;
   ASSERT_EQ(bytes, str.getBytes());
 }
 
 TEST_F(JUtf8StringTest, TestConstructFromString2ByteCharacter)
 {
   std::vector<u1> bytes = { 0xc4, 0xb6 };
-  JUtf8String str("Ķ");
+  JUtf8String str;
+  std::stringstream ss;
+  ss << std::string("Ķ");
+  ss >> str;
   ASSERT_EQ(bytes, str.getBytes());
 }
 
 TEST_F(JUtf8StringTest, TestConstructFromStringSingleNullCharacter)
 {
   std::vector<u1> bytes = { 0xc0, 0x80 };
-  JUtf8String str(std::string("\0", 1));
+  JUtf8String str;
+  std::stringstream ss;
+  ss << std::string(std::string("\0", 1));
+  ss >> str;
   ASSERT_EQ(bytes, str.getBytes());
 }
 
 TEST_F(JUtf8StringTest, TestConstructFromStringEmbeddedNullCharacter)
 {
   std::vector<u1> bytes = { 0x41, 0xc0, 0x80, 0x42 };
-  JUtf8String str(std::string("A\0B",3));
+  JUtf8String str;
+  std::stringstream ss;
+  ss << std::string(std::string("A\0B",3));
+  ss >> str;
   ASSERT_EQ(bytes, str.getBytes());
 }
 
 TEST_F(JUtf8StringTest, TestConstructFromString3ByteCharacter)
 {
   std::vector<u1> bytes = { 0xe2, 0x80, 0xb9 };
-  JUtf8String str("‹");
+  JUtf8String str;
+  std::stringstream ss;
+  ss << std::string("‹");
+  ss >> str;
   ASSERT_EQ(bytes, str.getBytes());
 }
 
 TEST_F(JUtf8StringTest, TestConstructFromString6ByteCharacter)
 {
   std::vector<u1> bytes = { 0xed, 0xa1, 0x80, 0xed, 0xbc, 0x8a };
-  JUtf8String str("𐌊");
+  JUtf8String str;
+  std::stringstream ss;
+  ss << std::string("𐌊");
+  ss >> str;
   ASSERT_EQ(bytes, str.getBytes());
 }
 
 TEST_F(JUtf8StringTest, TestConstructFromString6ByteCharacterOverU10fff)
 {
   std::vector<u1> bytes = { 0xed, 0xa2, 0x80, 0xed, 0xb1, 0xa8 };
-  JUtf8String str("𠁨");
+  JUtf8String str;
+  std::stringstream ss;
+  ss << std::string("𠁨");
+  ss >> str;
   ASSERT_EQ(bytes, str.getBytes());
 }
 }

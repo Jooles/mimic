@@ -5,32 +5,20 @@
 namespace mimic
 {
 
-JUtf8String::JUtf8String(std::vector<u1>& bytes, u2 length)
-	: bytes(bytes)
+JUtf8String::JUtf8String(std::vector<u1> bytes)
+	: bytes(std::move(bytes))
 {
-  checkString(length);
-};
-
-JUtf8String::JUtf8String(std::vector<u1>&& bytes, u2 length)
-	: bytes(bytes)
-{
-  checkString(length);
-};
-
-void JUtf8String::checkString(u2& numberOfBytes)
-{
-  if (numberOfBytes != bytes.size())
-    throw parsing::parse_failure("Wrong length");
-  for (int i = 0; i < numberOfBytes; i++)
+  for (auto i = this->bytes.begin(); i < this->bytes.end(); i++)
   {
-    if (bytes[i] == 0 || (bytes[i] >= 0xf0 && bytes[i] <= 0xff))
+    u1 byte = *i;
+    if (byte == 0 || (byte >= 0xf0 && byte <= 0xff))
     {
       std::stringstream ss;
-      ss << "Illegal character: " << std::hex << std::setw(2) << bytes[i] << std::dec << std::endl;
+      ss << "Illegal character: " << std::hex << std::setw(2) << byte << std::dec << std::endl;
       throw parsing::parse_failure(ss.str().c_str());
     }
   }
-}
+};
 
 u2 JUtf8String::length() const
 {
@@ -63,7 +51,7 @@ void JUtf8String::nextIndex(std::vector<u1>::const_iterator& index) const
   }
 }
 
-u4 JUtf8String::get(std::vector<u1>::const_iterator& index) const
+u4 JUtf8String::charAt(std::vector<u1>::const_iterator& index) const
 {
   u4 code_point;
   if (*index == 0xed)
@@ -91,45 +79,7 @@ u4 JUtf8String::get(std::vector<u1>::const_iterator& index) const
   return code_point;
 }
 
-void JUtf8String::put(const std::vector<u1>::iterator& index, u4 code_point)
-{
-  std::vector<u1> code_point_bytes;
-  if (code_point > 0xffff)
-  {
-    code_point_bytes = {
-      0xed,
-      ((code_point >> 16) & 0x0f) | 0xa0,
-      ((code_point >> 10) & 0x3f) | 0x80,
-      0xed,
-      ((code_point >> 6) & 0x0f) | 0xb0,
-      (code_point & 0x3f) | 0x80
-    };
-  }
-  else if (code_point > 0x7ff)
-  {
-    code_point_bytes = {
-      ((code_point >> 12) & 0x0f) | 0xe0,
-      ((code_point >> 6) & 0x3f) | 0x80,
-      (code_point & 0x3f) | 0x80
-    };
-  }
-  else if (code_point == 0 || code_point > 0x7f)
-  {
-    code_point_bytes = {
-      ((code_point >> 6) & 0x1f) | 0xc0,
-      (code_point & 0x3f) | 0x80
-    };
-  }
-  else
-  {
-    code_point_bytes = {
-      static_cast<u1>(code_point & 0x7f)
-    };
-  }
-  replace(index, code_point_bytes);
-}
-
-void JUtf8String::replace(const std::vector<u1>::iterator& index, std::vector<u1> code_point_bytes)
+void JUtf8String::replaceChar(const std::vector<u1>::iterator& index, std::vector<u1> code_point_bytes)
 {
   if (index < bytes.end())
   {

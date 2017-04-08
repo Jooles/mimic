@@ -26,43 +26,14 @@ namespace mimic
 class JUtf8String
 {
 public:
-  /**
-   * Construct a JUtf8String from a std::vector<u1>
-   *
-   * @param bytes The modified UTF-8 byte encoded string
-   * @param length The number of bytes (used as a sanity check)
-   */
-  JUtf8String(std::vector<u1>& bytes, u2 length);
+  JUtf8String() {};
 
   /**
    * Construct a JUtf8String from a std::vector<u1>
    *
    * @param bytes The modified UTF-8 byte encoded string
-   * @param length The number of bytes (used as a sanity check)
    */
-  JUtf8String(std::vector<u1>&& bytes, u2 length);
-
-  /**
-   * Construct a JUtf8String from a std::string
-   */
-  JUtf8String(std::string& str)
-  {
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-    std::u32string wstr = converter.from_bytes(str);
-    for (auto i = wstr.begin(); i != wstr.end(); i++)
-      put(bytes.end(), static_cast<u4>(*i));
-  };
-
-  /**
-   * Construct a JUtf8String from a std::string
-   */
-  JUtf8String(std::string&& str)
-  {
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-    std::u32string wstr = converter.from_bytes(str);
-    for (auto i = wstr.begin(); i != wstr.end(); i++)
-      put(bytes.end(), static_cast<u4>(*i));
-  }
+  JUtf8String(std::vector<u1> bytes);
 
   /**
    * @return the number of characters in the string (not the number of bytes)
@@ -72,35 +43,60 @@ public:
   /**
    * @return the 4-byte value of the character at the specified index
    */
-  u4 get(std::vector<u1>::const_iterator& index) const;
-
-  /**
-   * @param index the index to set with the specified value
-   * @param code_point the 4-byte value of the character at the specified index
-   */
-  void put(const std::vector<u1>::iterator& index, u4 code_point);
+  u4 charAt(std::vector<u1>::const_iterator& index) const;
 
   /**
    * @return a copy of the internal byte buffer
    */
   std::vector<u1> getBytes() { return bytes; };
-	friend std::ostream& operator<<(std::ostream& os, const JUtf8String& str)
+
+  friend std::ostream& operator<<(std::ostream& os, const JUtf8String& str)
   {
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
     for (auto i = str.bytes.begin(); i < str.bytes.end(); str.nextIndex(i))
     {
-      os << converter.to_bytes(str.get(i));
+      os << converter.to_bytes(str.charAt(i));
     }
     return os;
   }
 
-private:
-  /**
-   * Checks the encoded string for invalid byte values
-   * @throws parsing::parse_failure if invalid values are found
-   */
-  void checkString(u2& numberOfBytes);
+  friend std::istream& operator>>(std::istream& is, JUtf8String& str)
+  {
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+    std::u32string wstr = converter.from_bytes(static_cast<std::stringstream const&>(std::stringstream() << is.rdbuf()).str());
+    std::vector<u1> converted_bytes;
+    for (auto code_point = wstr.begin(); code_point != wstr.end(); code_point++)
+    {
+      if (*code_point > 0xffff)
+      {
+        converted_bytes.push_back(0xed);
+        converted_bytes.push_back(((*code_point >> 16) & 0x0f) | 0xa0);
+        converted_bytes.push_back(((*code_point >> 10) & 0x3f) | 0x80);
+        converted_bytes.push_back(0xed);
+        converted_bytes.push_back(((*code_point >> 6) & 0x0f) | 0xb0);
+        converted_bytes.push_back((*code_point & 0x3f) | 0x80);
+      }
+      else if (*code_point > 0x7ff)
+      {
+        converted_bytes.push_back(((*code_point >> 12) & 0x0f) | 0xe0);
+        converted_bytes.push_back(((*code_point >> 6) & 0x3f) | 0x80);
+        converted_bytes.push_back((*code_point & 0x3f) | 0x80);
+      }
+      else if (*code_point == 0 || *code_point > 0x7f)
+      {
+        converted_bytes.push_back(((*code_point >> 6) & 0x1f) | 0xc0);
+        converted_bytes.push_back((*code_point & 0x3f) | 0x80);
+      }
+      else
+      {
+        converted_bytes.push_back(*code_point & 0x7f);
+      }
+    }
+    str.bytes.insert(str.bytes.end(), converted_bytes.cbegin(), converted_bytes.cend());
+    return is;
+  }
 
+private:
   /**
    * Modifies the given iterator to point at the next code point
    *
@@ -112,9 +108,9 @@ private:
    * Replaces a code point in the string
    *
    * @param index An iterator pointing to the code point to replace
-   * @param code_point_bytes the modified UTF-8 encoded code point to insert
+   * @param *code_point_bytes the modified UTF-8 encoded code point to insert
    */
-  void replace(const std::vector<u1>::iterator& index, std::vector<u1> code_point_bytes);
+  void replaceChar(const std::vector<u1>::iterator& index, std::vector<u1> code_point_bytes);
 
 	std::vector<u1> bytes;
 };
