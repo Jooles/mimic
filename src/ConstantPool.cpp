@@ -64,7 +64,7 @@ ConstantPool::ConstantPool(parsing::ByteConsumer& bc, u2 constant_pool_count)
     case Utf8:
     {
       u2 numberOfBytes = bc.readU2();
-      pool.push_back(Utf8_info{bc.readBytes(numberOfBytes)});
+      pool.push_back(JUtf8String(bc.readBytes(numberOfBytes)));
       break;
     }
     case MethodHandle:

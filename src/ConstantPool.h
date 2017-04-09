@@ -39,6 +39,18 @@ public:
     InvokeDynamic = 18
   };
 
+  enum reference_kind : u1 {
+    getField = 1,
+    getStatic = 2,
+    putField = 3,
+    putStatic = 4,
+    invokeVirtual = 5,
+    invokeStatic = 6,
+    invokeSpecial = 7,
+    newInvokeSpecial = 8,
+    invokeInterface = 9
+  };
+
   /** Representation of a Class entry in the constant pool */
   typedef struct Class_info
   {
@@ -110,20 +122,18 @@ public:
   typedef struct Long_info
   {
     Long_info(u4 high_bytes, u4 low_bytes)
-    : low_bytes(low_bytes) {
+    : value((static_cast<u8>(high_bytes) << 32) | low_bytes) {
     }
-    u4 high_bytes;
-    u4 low_bytes;
+    u8 value;
   } Long_info;
 
   /** Representation of a Double entry in the constant pool. Takes up two spaces. */
   typedef struct Double_info
   {
     Double_info(u4 high_bytes, u4 low_bytes)
-    : low_bytes(low_bytes) {
+    : bytes((static_cast<u8>(high_bytes) << 32) | low_bytes) {
     }
-    u4 high_bytes;
-    u4 low_bytes;
+    u8 bytes;
   } Double_info;
 
   /** Representation of a NameAndType entry in the constant pool. */
@@ -136,22 +146,13 @@ public:
     u2 descriptor_index;
   } NameAndType_info;
 
-  /** Representation of a Utf8 entry in the constant pool. */
-  typedef struct Utf8_info
-  {
-    Utf8_info(std::vector<u1> bytes)
-    : str(bytes) {
-    }
-    JUtf8String str;
-  } Utf8_info;
-
   /** Representation of a Method Handle entry in the constant pool. */
   typedef struct MethodHandle_info
   {
     MethodHandle_info(u1 reference_kind, u2 reference_index)
     : reference_index(reference_index) {
     }
-    u1 reference_kind;
+    reference_kind kind;
     u2 reference_index;
   } MethodHandle_info;
 
@@ -174,19 +175,19 @@ public:
     u2 name_and_type_index;
   } InvokeDynamic_info;
 
-	ConstantPool() {};
-	/**
-	 * Parses the constant pool entries from a ByteConsumer
-	 *
-	 * @param the ByteConsumer to use
-	 * @param the number of constant pool entries
-	 */
-	ConstantPool(parsing::ByteConsumer&, u2);
-	/**
-	 * @param index the index of the constant pool entry to get
-	 * @return the constant pool entry at the specified index
-	 */
-	template <typename T> T& get(const u2 index);
+  ConstantPool() {};
+  /**
+   * Parses the constant pool entries from a ByteConsumer
+   *
+   * @param the ByteConsumer to use
+   * @param the number of constant pool entries
+   */
+  ConstantPool(parsing::ByteConsumer&, u2);
+  /**
+   * @param index the index of the constant pool entry to get
+   * @return the constant pool entry at the specified index
+   */
+  template <typename T> T& get(const u2 index);
 private:
   typedef variant<tag,
                   Class_info,
@@ -202,8 +203,8 @@ private:
                   Methodref_info,
                   NameAndType_info,
                   String_info,
-                  Utf8_info> cp_type;
-	std::vector<cp_type> pool;
+                  JUtf8String> cp_type;
+  std::vector<cp_type> pool;
 };
 
 }

@@ -18,24 +18,24 @@ class JUtf8StringTest: public testing::Test
 {
 
 protected:
-	JUtf8StringTest()
-	{
-	}
+  JUtf8StringTest()
+  {
+  }
 
-	virtual ~JUtf8StringTest()
-	{
-	}
+  virtual ~JUtf8StringTest()
+  {
+  }
 };
 
 TEST_F(JUtf8StringTest, TestNullByteThrowsOnConstruction)
 {
-	std::vector<u1> bytes = { 0x00 };
-	ASSERT_THROW(JUtf8String{bytes}, parsing::parse_failure);
+  std::vector<u1> bytes = { 0x00 };
+  ASSERT_THROW(JUtf8String{bytes}, parsing::parse_failure);
 }
 
 TEST_F(JUtf8StringTest, TestByteInInvalidRangeThrowsOnConstruction)
 {
-	for (int i = 0xf0; i <= 0xff; i++) {
+  for (int i = 0xf0; i <= 0xff; i++) {
     std::vector<u1> bytes = { (u1) i };
     ASSERT_THROW(JUtf8String{bytes}, parsing::parse_failure);
   }
@@ -43,7 +43,7 @@ TEST_F(JUtf8StringTest, TestByteInInvalidRangeThrowsOnConstruction)
 
 TEST_F(JUtf8StringTest, TestOneByteCharacterGivesLength1)
 {
-	for (u1 i = 0x01; i < 0x80; i++) {
+  for (u1 i = 0x01; i < 0x80; i++) {
     std::vector<u1> bytes = { (u1) i };
     ASSERT_EQ(1, JUtf8String(bytes).length()) << "When checking char /U" << std::hex << std::setfill('0') << std::setw(4) << (int)i << std::dec;
   }

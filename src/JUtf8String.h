@@ -112,7 +112,7 @@ private:
    */
   void replaceChar(const std::vector<u1>::iterator& index, std::vector<u1> code_point_bytes);
 
-	std::vector<u1> bytes;
+  std::vector<u1> bytes;
 };
 
 }

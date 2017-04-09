@@ -6,7 +6,7 @@ namespace mimic
 {
 
 JUtf8String::JUtf8String(std::vector<u1> bytes)
-	: bytes(std::move(bytes))
+  : bytes(std::move(bytes))
 {
   for (auto i = this->bytes.begin(); i < this->bytes.end(); i++)
   {
