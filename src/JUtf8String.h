@@ -8,15 +8,16 @@
 #ifndef SRC_MIMIC_JUTF8STRING_H_
 #define SRC_MIMIC_JUTF8STRING_H_
 
-#include <boost/iterator.hpp>
-#include <boost/iterator_adaptors.hpp>
 #include "Common.h"
-#include <locale>
 #include <codecvt>
+#include <iterator>
+#include <locale>
 #include "parsing/ByteConsumer.h"
 
 namespace mimic
 {
+
+class JUtf8StringIterator;
 
 /**
  * A modified UTF-8 string
@@ -26,6 +27,99 @@ namespace mimic
 class JUtf8String
 {
 public:
+  class JUtf8StringIterator: public std::forward_iterator_tag
+  {
+    std::vector<u1>::const_iterator b, e;
+    
+  public:
+
+    using value_type = std::vector<u1>;
+
+    JUtf8StringIterator(std::vector<u1>::const_iterator b_, std::vector<u1>::const_iterator e_)
+    :b(b_), e(e_)
+    {}
+    
+    u4 operator*()
+    {
+      u4 code_point;
+      if (*b == 0xed)
+      {
+        code_point = ((*(b + 1) & 0x0f) << 16);
+        code_point |= ((*(b + 2) & 0x3f) << 10);
+        code_point |= ((*(b + 4) & 0x0f) << 6);
+        code_point |= (*(b + 5) & 0x3f);
+      }
+      else if ((*b & 0xe0) == 0xe0)
+      {
+        code_point = (*b & 0x0f) << 12;
+        code_point |= (*(b + 1) & 0x3f) << 6;
+        code_point |= (*(b + 2) & 0x3f);
+      }
+      else if ((*b & 0xc0) == 0xc0)
+      {
+        code_point = (*b & 0x1f) << 6;
+        code_point |= (*(b + 1) & 0x3f);
+      }
+      else
+      {
+        code_point = *b;
+      }
+      return code_point;
+    }
+
+    JUtf8StringIterator& operator++()
+    {
+      b = find_next();
+      return *this;
+    }
+
+    JUtf8StringIterator& operator++(int)
+    {
+      b = find_next();
+      return *this;
+    }
+
+    bool operator<(const JUtf8StringIterator& i)
+    {
+      return b < i.b;
+    }
+    
+    bool operator==(const JUtf8StringIterator& i)
+    {
+      return b == i.b;
+    }
+
+    bool operator!=(const JUtf8StringIterator& i)
+    {
+      return b != i.b;
+    }
+
+  private:
+    std::vector<u1>::const_iterator find_next()
+    {
+      auto current = b;
+      if (*current == 0xed)
+      {
+        current += 6;
+      }
+      else if ((*current & 0xe0) == 0xe0)
+      {
+        current += 3;
+      }
+      else if ((*current & 0xc0) == 0xc0)
+      {
+        current += 2;
+      }
+      else
+      {
+        current += 1;
+      }
+      if (current > e)
+        return e;
+      return current;
+    }
+  };
+
   JUtf8String() {};
 
   /**
@@ -36,26 +130,49 @@ public:
   JUtf8String(std::vector<u1> bytes);
 
   /**
+   * Construct a JUtf8String from a std::string
+   *
+   * @param str The string to convert
+   */
+  JUtf8String(std::string str) {
+    std::stringstream ss;
+    ss << str;
+    ss >> *this;
+  };
+
+  /**
+   * Construct a JUtf8String from a char*
+   *
+   * @param str The C-style string to convert
+   * @param length The number of bytes in the string
+   */
+  JUtf8String(const char* str, u2 length)
+    : JUtf8String(std::string(str, length)) {};
+
+  /**
    * @return the number of characters in the string (not the number of bytes)
    */
   u2 length() const;
-
-  /**
-   * @return the 4-byte value of the character at the specified index
-   */
-  u4 charAt(std::vector<u1>::const_iterator& index) const;
 
   /**
    * @return a copy of the internal byte buffer
    */
   std::vector<u1> getBytes() { return bytes; };
 
+  JUtf8StringIterator begin() const {
+    return JUtf8StringIterator(bytes.begin(), bytes.end());
+  };
+
+  JUtf8StringIterator end() const {
+    return JUtf8StringIterator(bytes.end(), bytes.end());
+  };
+
   friend std::ostream& operator<<(std::ostream& os, const JUtf8String& str)
   {
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-    for (auto i = str.bytes.begin(); i < str.bytes.end(); str.nextIndex(i))
+    for (auto i = str.begin(); i != str.end(); i++)
     {
-      os << converter.to_bytes(str.charAt(i));
+      os << converter.to_bytes(*i);
     }
     return os;
   }
@@ -98,19 +215,14 @@ public:
 
 private:
   /**
-   * Modifies the given iterator to point at the next code point
-   *
-   * @param index an interator pointing to a code point in the string
-   */
-  void nextIndex(std::vector<u1>::const_iterator& index) const;
-
-  /**
    * Replaces a code point in the string
    *
    * @param index An iterator pointing to the code point to replace
    * @param *code_point_bytes the modified UTF-8 encoded code point to insert
    */
   void replaceChar(const std::vector<u1>::iterator& index, std::vector<u1> code_point_bytes);
+
+  friend JUtf8StringIterator;
 
   std::vector<u1> bytes;
 };

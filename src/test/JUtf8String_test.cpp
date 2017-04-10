@@ -52,6 +52,8 @@ TEST_F(JUtf8StringTest, TestOneByteCharacterGivesLength1)
 TEST_F(JUtf8StringTest, TestTwoByteCharacterGivesLength1)
 {
   for (int i = 0x80; i < 0x7ff; i ++) {
+    if (i >= 0xf0 && i <= 0xff)
+      continue;
     u1 byte1 = ((i >> 6) & 0x1f) | 0xc0;
     u1 byte2 = (i & 0x3f) | 0x80;
     std::vector<u1> bytes = { byte1, byte2 };
@@ -176,7 +178,7 @@ TEST_F(JUtf8StringTest, TestOstream6ByteCharacterOverU10fff)
   ASSERT_STREQ(std::string("𠁨").c_str(), ss.str().c_str());
 }
 
-TEST_F(JUtf8StringTest, TestConstructFromString1ByteCharacter)
+TEST_F(JUtf8StringTest, TestIstream1ByteCharacter)
 {
   std::vector<u1> bytes = { 0x36 };
   JUtf8String str;
@@ -186,7 +188,7 @@ TEST_F(JUtf8StringTest, TestConstructFromString1ByteCharacter)
   ASSERT_EQ(bytes, str.getBytes());
 }
 
-TEST_F(JUtf8StringTest, TestConstructFromString2ByteCharacter)
+TEST_F(JUtf8StringTest, TestIstream2ByteCharacter)
 {
   std::vector<u1> bytes = { 0xc4, 0xb6 };
   JUtf8String str;
@@ -196,7 +198,7 @@ TEST_F(JUtf8StringTest, TestConstructFromString2ByteCharacter)
   ASSERT_EQ(bytes, str.getBytes());
 }
 
-TEST_F(JUtf8StringTest, TestConstructFromStringSingleNullCharacter)
+TEST_F(JUtf8StringTest, TestIstreamSingleNullCharacter)
 {
   std::vector<u1> bytes = { 0xc0, 0x80 };
   JUtf8String str;
@@ -206,7 +208,7 @@ TEST_F(JUtf8StringTest, TestConstructFromStringSingleNullCharacter)
   ASSERT_EQ(bytes, str.getBytes());
 }
 
-TEST_F(JUtf8StringTest, TestConstructFromStringEmbeddedNullCharacter)
+TEST_F(JUtf8StringTest, TestIstreamEmbeddedNullCharacter)
 {
   std::vector<u1> bytes = { 0x41, 0xc0, 0x80, 0x42 };
   JUtf8String str;
@@ -216,7 +218,7 @@ TEST_F(JUtf8StringTest, TestConstructFromStringEmbeddedNullCharacter)
   ASSERT_EQ(bytes, str.getBytes());
 }
 
-TEST_F(JUtf8StringTest, TestConstructFromString3ByteCharacter)
+TEST_F(JUtf8StringTest, TestIstream3ByteCharacter)
 {
   std::vector<u1> bytes = { 0xe2, 0x80, 0xb9 };
   JUtf8String str;
@@ -226,7 +228,7 @@ TEST_F(JUtf8StringTest, TestConstructFromString3ByteCharacter)
   ASSERT_EQ(bytes, str.getBytes());
 }
 
-TEST_F(JUtf8StringTest, TestConstructFromString6ByteCharacter)
+TEST_F(JUtf8StringTest, TestIstream6ByteCharacter)
 {
   std::vector<u1> bytes = { 0xed, 0xa1, 0x80, 0xed, 0xbc, 0x8a };
   JUtf8String str;
@@ -236,13 +238,62 @@ TEST_F(JUtf8StringTest, TestConstructFromString6ByteCharacter)
   ASSERT_EQ(bytes, str.getBytes());
 }
 
-TEST_F(JUtf8StringTest, TestConstructFromString6ByteCharacterOverU10fff)
+TEST_F(JUtf8StringTest, TestIstream6ByteCharacterOverU10fff)
 {
   std::vector<u1> bytes = { 0xed, 0xa2, 0x80, 0xed, 0xb1, 0xa8 };
   JUtf8String str;
   std::stringstream ss;
   ss << std::string("𠁨");
   ss >> str;
+  ASSERT_EQ(bytes, str.getBytes());
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromString1ByteCharacter)
+{
+  std::vector<u1> bytes = { 0x36 };
+  JUtf8String str("6");
+  ASSERT_EQ(bytes, str.getBytes());
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromString2ByteCharacter)
+{
+  std::vector<u1> bytes = { 0xc4, 0xb6 };
+  JUtf8String str("Ķ");
+  ASSERT_EQ(bytes, str.getBytes());
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromStringSingleNullCharacter)
+{
+  std::vector<u1> bytes = { 0xc0, 0x80 };
+  JUtf8String str("\0", 1);
+  ASSERT_EQ(bytes, str.getBytes());
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromStringEmbeddedNullCharacter)
+{
+  std::vector<u1> bytes = { 0x41, 0xc0, 0x80, 0x42 };
+  JUtf8String str("A\0B", 3);
+  ASSERT_EQ(bytes, str.getBytes());
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromString3ByteCharacter)
+{
+  std::vector<u1> bytes = { 0xe2, 0x80, 0xb9 };
+  JUtf8String str("‹");
+  ASSERT_EQ(bytes, str.getBytes());
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromString6ByteCharacter)
+{
+  std::vector<u1> bytes = { 0xed, 0xa1, 0x80, 0xed, 0xbc, 0x8a };
+  JUtf8String str("𐌊");
+  ASSERT_EQ(bytes, str.getBytes());
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromString6ByteCharacterOverU10fff)
+{
+  std::vector<u1> bytes = { 0xed, 0xa2, 0x80, 0xed, 0xb1, 0xa8 };
+  JUtf8String str("𠁨");
   ASSERT_EQ(bytes, str.getBytes());
 }
 }
