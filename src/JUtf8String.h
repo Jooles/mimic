@@ -73,10 +73,11 @@ public:
       return *this;
     }
 
-    JUtf8StringIterator& operator++(int)
+    JUtf8StringIterator operator++(int)
     {
-      b = find_next();
-      return *this;
+      JUtf8StringIterator result = *this;
+      ++(*this);
+      return result;
     }
 
     bool operator<(const JUtf8StringIterator& i)
@@ -170,7 +171,7 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const JUtf8String& str)
   {
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-    for (auto i = str.begin(); i != str.end(); i++)
+    for (auto i = str.begin(); i != str.end(); ++i)
     {
       os << converter.to_bytes(*i);
     }
@@ -182,7 +183,7 @@ public:
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
     std::u32string wstr = converter.from_bytes(static_cast<std::stringstream const&>(std::stringstream() << is.rdbuf()).str());
     std::vector<u1> converted_bytes;
-    for (auto code_point = wstr.begin(); code_point != wstr.end(); code_point++)
+    for (auto code_point = wstr.begin(); code_point != wstr.end(); ++code_point)
     {
       if (*code_point > 0xffff)
       {

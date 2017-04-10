@@ -8,7 +8,7 @@ namespace mimic
 JUtf8String::JUtf8String(std::vector<u1> bytes)
   : bytes(std::move(bytes))
 {
-  for (auto i = this->bytes.begin(); i != this->bytes.end(); i++)
+  for (auto i = this->bytes.begin(); i != this->bytes.end(); ++i)
   {
     u1 byte = *i;
     if (byte == 0 || (byte >= 0xf0 && byte <= 0xff))
@@ -23,7 +23,7 @@ JUtf8String::JUtf8String(std::vector<u1> bytes)
 u2 JUtf8String::length() const
 {
   u2 length = 0;
-  for (auto i = begin(); i != end(); i++)
+  for (auto i = begin(); i != end(); ++i)
   {
     length++;
   }
