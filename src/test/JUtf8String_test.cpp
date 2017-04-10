@@ -45,7 +45,7 @@ TEST_F(JUtf8StringTest, TestOneByteCharacterGivesLength1)
 {
   for (u1 i = 0x01; i < 0x80; i++) {
     std::vector<u1> bytes = { (u1) i };
-    ASSERT_EQ(1, JUtf8String(bytes).length()) << "When checking char /U" << std::hex << std::setfill('0') << std::setw(4) << (int)i << std::dec;
+    ASSERT_EQ(1, JUtf8String(bytes).length());
   }
 }
 
@@ -58,15 +58,7 @@ TEST_F(JUtf8StringTest, TestTwoByteCharacterGivesLength1)
     u1 byte2 = (i & 0x3f) | 0x80;
     std::vector<u1> bytes = { byte1, byte2 };
     ASSERT_EQ(2, bytes.size());
-    ASSERT_EQ(1, JUtf8String(bytes).length()) << "When checking char /U"
-                                              << std::hex
-                                              << std::setfill('0')
-                                              << std::setw(4)
-                                              << (int)i
-                                              << ", bytes: "
-                                              << std::setw(2) << (int)byte1 << ", "
-                                              << std::setw(2) << (int)byte2
-                                              << std::dec;
+    ASSERT_EQ(1, JUtf8String(bytes).length());
   }
 }
 
@@ -78,16 +70,7 @@ TEST_F(JUtf8StringTest, TestThreeByteCharacterGivesLength1)
     u1 byte3 = (i & 0x3f) | 0x80;
     std::vector<u1> bytes = { byte1, byte2, byte3 };
     ASSERT_EQ(3, bytes.size());
-    ASSERT_EQ(1, JUtf8String(bytes).length()) << "When checking char /U"
-                                              << std::hex
-                                              << std::setfill('0')
-                                              << std::setw(4)
-                                              << (int)i
-                                              << ", bytes: "
-                                              << std::setw(2) << (int)byte1 << ", "
-                                              << std::setw(2) << (int)byte2 << ", "
-                                              << std::setw(2) << (int)byte3
-                                              << std::dec;
+    ASSERT_EQ(1, JUtf8String(bytes).length());
   }
 }
 
@@ -100,18 +83,9 @@ TEST_F(JUtf8StringTest, Test6ByteCharacterGivesLength1)
     u1 byte4 = 0xed;
     u1 byte5 = ((i >> 6) & 0x0f) | 0xb0;
     u1 byte6 = (i & 0x3f) | 0x80;
-    std::vector<u1> bytes = { byte1, byte2, byte3 };
-    ASSERT_EQ(3, bytes.size());
-    ASSERT_EQ(1, JUtf8String(bytes).length()) << "When checking char /U"
-                                              << std::hex
-                                              << std::setfill('0')
-                                              << std::setw(4)
-                                              << (int)i
-                                              << ", bytes: "
-                                              << std::setw(2) << (int)byte1 << ", "
-                                              << std::setw(2) << (int)byte2 << ", "
-                                              << std::setw(2) << (int)byte3
-                                              << std::dec;
+    std::vector<u1> bytes = { byte1, byte2, byte3, byte4, byte5, byte6 };
+    ASSERT_EQ(6, bytes.size());
+    ASSERT_EQ(1, JUtf8String(bytes).length());
   }
 }
 
@@ -295,5 +269,122 @@ TEST_F(JUtf8StringTest, TestConstructFromString6ByteCharacterOverU10fff)
   std::vector<u1> bytes = { 0xed, 0xa2, 0x80, 0xed, 0xb1, 0xa8 };
   JUtf8String str("𠁨");
   ASSERT_EQ(bytes, str.getBytes());
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromEmptyString)
+{
+  std::vector<u1> bytes;
+  JUtf8String str("");
+  ASSERT_EQ(bytes, str.getBytes());
+  ASSERT_EQ(0, str.length());
+}
+
+TEST_F(JUtf8StringTest, TestIteratorPlus)
+{
+  JUtf8String str("foo");
+  auto iter = str.begin();
+  ASSERT_EQ('f', *iter);
+  ASSERT_EQ('o', *(iter + 2));
+  ASSERT_EQ('f', *iter);
+}
+
+TEST_F(JUtf8StringTest, TestIteratorPlusEquals)
+{
+  JUtf8String str("bar");
+  auto iter = str.begin();
+  ASSERT_EQ('b', *iter);
+  ASSERT_EQ('r', *(iter += 2));
+  ASSERT_EQ('r', *iter);
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromRange)
+{
+  JUtf8String str("foobar");
+  ASSERT_EQ(JUtf8String("foo"), JUtf8String(str.begin(), str.begin()+3));
+}
+
+TEST_F(JUtf8StringTest, TestConstructFromRangeMiddleOfString)
+{
+  JUtf8String str("foobar");
+  ASSERT_EQ(JUtf8String("oba"), JUtf8String(str.begin() + 2, str.begin() + 5));
+}
+
+TEST_F(JUtf8StringTest, TestFindSingleCharacter)
+{
+  JUtf8String str("foobar");
+  ASSERT_EQ(str.begin() + 3, str.find(JUtf8String("b")));
+}
+
+TEST_F(JUtf8StringTest, TestFindString)
+{
+  JUtf8String str("foobar");
+  ASSERT_EQ(str.begin() + 2, str.find(JUtf8String("oba")));
+}
+
+TEST_F(JUtf8StringTest, TestFindNotFound)
+{
+  JUtf8String str("foobar");
+  ASSERT_EQ(str.end(), str.find(JUtf8String("wibble")));
+}
+
+TEST_F(JUtf8StringTest, TestContainsSingleCharacter)
+{
+  JUtf8String str("foobar");
+  ASSERT_TRUE(str.contains(JUtf8String("b")));
+}
+
+TEST_F(JUtf8StringTest, TestContainsString)
+{
+  JUtf8String str("foobar");
+  ASSERT_TRUE(str.contains(JUtf8String("oba")));
+}
+
+TEST_F(JUtf8StringTest, TestContainsNotFound)
+{
+  JUtf8String str("foobar");
+  ASSERT_FALSE(str.contains(JUtf8String("wibble")));
+}
+
+TEST_F(JUtf8StringTest, TestContainsList)
+{
+  JUtf8String str("foobar");
+  ASSERT_TRUE(str.contains(std::vector<JUtf8String> {JUtf8String("q"), JUtf8String("ba")}));
+}
+
+TEST_F(JUtf8StringTest, TestContainsListNotFound)
+{
+  JUtf8String str("foobar");
+  ASSERT_FALSE(str.contains(std::vector<JUtf8String> {JUtf8String("q"), JUtf8String("wub")}));
+}
+
+TEST_F(JUtf8StringTest, TestSplitCharacterInMiddle)
+{
+  JUtf8String str("foobarbat");
+  std::vector<JUtf8String> expected = {JUtf8String("fooba"), JUtf8String("bat")};
+  auto actual = str.split(JUtf8String("r"));
+  ASSERT_EQ(2, actual.size());
+  ASSERT_EQ(expected[0], actual[0]);
+  ASSERT_EQ(expected[1], actual[1]);
+}
+
+TEST_F(JUtf8StringTest, TestSplitStringInMiddle)
+{
+  JUtf8String str("foobarbat");
+  std::vector<JUtf8String> expected = {JUtf8String("foo"), JUtf8String("bat")};
+  auto actual = str.split(JUtf8String("bar"));
+  ASSERT_EQ(2, actual.size());
+  ASSERT_EQ(expected[0], actual[0]);
+  ASSERT_EQ(expected[1], actual[1]);
+}
+
+TEST_F(JUtf8StringTest, TestSplitEmptyDelimiter)
+{
+  JUtf8String str("foo");
+  std::vector<JUtf8String> expected = {JUtf8String("f"), JUtf8String("o"), JUtf8String("o")};
+  auto actual = str.split(JUtf8String(""));
+  ASSERT_EQ(3, actual.size());
+  ASSERT_EQ(expected[0], actual[0]);
+  ASSERT_EQ(expected[1], actual[1]);
+  ASSERT_EQ(expected[2], actual[2]);
 }
 }

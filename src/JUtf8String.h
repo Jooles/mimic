@@ -80,17 +80,32 @@ public:
       return result;
     }
 
-    bool operator<(const JUtf8StringIterator& i)
+    JUtf8StringIterator operator+(int num)
+    {
+      JUtf8StringIterator result = *this;
+      for (int i = 0; i < num; i++)
+        ++result;
+      return result;
+    }
+
+    JUtf8StringIterator& operator+=(int num)
+    {
+      for (int i = 0; i < num; i++)
+        ++(*this);
+      return *this;
+    }
+
+    bool operator<(const JUtf8StringIterator& i) const
     {
       return b < i.b;
     }
     
-    bool operator==(const JUtf8StringIterator& i)
+    bool operator==(const JUtf8StringIterator& i) const
     {
       return b == i.b;
     }
 
-    bool operator!=(const JUtf8StringIterator& i)
+    bool operator!=(const JUtf8StringIterator& i) const
     {
       return b != i.b;
     }
@@ -151,6 +166,20 @@ public:
     : JUtf8String(std::string(str, length)) {};
 
   /**
+   * Construct a JUtf8String from a range
+   *
+   * @param begin An iterator pointing to the first character of the new string
+   * @param end An iterator pointing to the last character of the new string
+   */
+  JUtf8String(JUtf8StringIterator begin, JUtf8StringIterator end)
+  {
+    for (auto i = begin; i != end; ++i)
+    {
+      bytes.insert(bytes.end(), *i);
+    }
+  };
+
+  /**
    * @return the number of characters in the string (not the number of bytes)
    */
   u2 length() const;
@@ -160,6 +189,39 @@ public:
    */
   std::vector<u1> getBytes() { return bytes; };
 
+  /**
+   * Splits the string where the specified delimiter is found
+   *
+   * @param delimiter The string around which to split, if found
+   * @return an array of strings
+   */
+  std::vector<JUtf8String> split(JUtf8String delimiter) const;
+
+  /**
+   * Find a string within this string
+   *
+   * @param needle The string to search for
+   * @return iterator pointing at the start of the found string if found,
+   *         else end()
+   */
+  JUtf8StringIterator find(JUtf8String needle) const;
+
+  /**
+   * Find if a string is within this string
+   *
+   * @param needle The string to search for
+   * @return true if found, else false
+   */
+  bool contains(JUtf8String needle) const;
+
+  /**
+   * Find if one of a set of strings is within this string
+   *
+   * @param needles The strings to search for
+   * @return true if a needle was found, else false
+   */
+  bool contains(std::vector<JUtf8String> needles) const;
+
   JUtf8StringIterator begin() const {
     return JUtf8StringIterator(bytes.begin(), bytes.end());
   };
@@ -167,6 +229,22 @@ public:
   JUtf8StringIterator end() const {
     return JUtf8StringIterator(bytes.end(), bytes.end());
   };
+
+  bool operator==(const JUtf8String& other) const
+  {
+    if (length() != other.length())
+      return false;
+    auto thisIter = begin();
+    auto otherIter = other.begin();
+    for (int i = 0; i < length(); i++)
+    {
+      if (*thisIter != *otherIter)
+        return false;
+      ++thisIter;
+      ++otherIter;
+    }
+    return true;
+  }
 
   friend std::ostream& operator<<(std::ostream& os, const JUtf8String& str)
   {

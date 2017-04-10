@@ -54,4 +54,74 @@ void JUtf8String::replaceChar(const std::vector<u1>::iterator& index, std::vecto
   bytes.insert(index, code_point_bytes.begin(), code_point_bytes.end());
 }
 
+std::vector<JUtf8String> JUtf8String::split(JUtf8String delimiter) const
+{
+  std::vector<JUtf8String> response;
+  if (delimiter.length() == 0)
+  {
+    for (auto i = begin(); i != end(); ++i)
+      response.push_back(JUtf8String(i, i + 1));
+  }
+  else
+  {
+    auto strStart = begin();
+    for (auto i = begin(); i != end(); ++i)
+    {
+      if (*i == *(delimiter.begin()))
+      {
+        auto delimiterLength = delimiter.length();
+        if (JUtf8String(i, i + delimiterLength) == delimiter)
+        {
+          response.push_back(JUtf8String(strStart, i));
+          i += delimiterLength;
+          strStart = i;
+        }
+      }
+    }
+    response.push_back(JUtf8String(strStart, end()));
+  }
+  return response;
+}
+
+JUtf8String::JUtf8StringIterator JUtf8String::find(JUtf8String needle) const
+{
+  if (needle.length() == 0)
+    return end();
+  for (auto i = begin(); i != end(); ++i)
+  {
+    if (*i == *(needle.begin()))
+    {
+      auto needleLength = needle.length();
+      if (JUtf8String(i, i + needleLength) == needle)
+        return i;
+    }
+  }
+  return end();
+}
+
+bool JUtf8String::contains(JUtf8String needle) const
+{
+  return contains(std::vector<JUtf8String>{needle});
+}
+
+bool JUtf8String::contains(std::vector<JUtf8String> needles) const
+{
+  if (needles.size() == 0)
+    return false;
+  for (auto i = begin(); i != end(); ++i)
+  {
+    for (auto j = needles.begin(); j != needles.end(); ++j)
+    {
+      auto needleLength = (*j).length();
+      if (needleLength == 0)
+        continue;
+      if ((*i == *(*j).begin()) && (JUtf8String(i, i + needleLength) == *j))
+      { 
+         return true;
+      }
+    }
+  }
+  return false;
+}
+
 }
