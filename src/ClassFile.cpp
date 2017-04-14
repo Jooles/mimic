@@ -6,6 +6,7 @@
  */
 
 #include "ClassFile.h"
+#include "ClassValidator.h"
 #include "parsing/ByteConsumer.h"
 
 namespace mimic
@@ -28,6 +29,7 @@ ClassFile::ClassFile(parsing::ByteConsumer& bc)
   constant_pool_count = bc.readU2();
   std::cout << "constant pool count: " << constant_pool_count << std::endl;
   constant_pool = ConstantPool(bc, constant_pool_count);
+  ClassValidator::validateConstantPool(constant_pool);
   flags = static_cast<access_flags>(bc.readU2());
   std::cout << "access flags: " << flags << std::endl;
   this_class = bc.readU2();

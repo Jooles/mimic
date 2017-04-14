@@ -5,6 +5,8 @@ libmimic_a_CPPFLAGS= -I$(top_srcdir)/src
 libmimic_a_SOURCES= \
     src/ConstantPool.cpp \
     src/ClassFile.cpp \
+    src/ClassValidator.cpp \
+    src/FieldDescriptor.cpp \
     src/JUtf8String.cpp \
     src/parsing/ByteConsumer.cpp
 
@@ -20,6 +22,8 @@ mimictest_LDADD=libmimic.a
 mimictest_SOURCES=src/test/MimicTest.cpp \
     src/test/gmock-gtest-all.cc \
     src/test/ClassFile_test.cpp \
+    src/test/ClassValidator_test.cpp \
+    src/test/FieldDescriptor_test.cpp \
     src/test/JUtf8String_test.cpp \
     src/test/parsing/ByteConsumer_test.cpp
 

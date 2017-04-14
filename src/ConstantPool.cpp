@@ -84,13 +84,4 @@ ConstantPool::ConstantPool(parsing::ByteConsumer& bc, u2 constant_pool_count)
   }
 }
 
-template <typename T> T& ConstantPool::get(const u2 index)
-{
-#ifdef HAVE_VARIANT
-  return (std::get<T>(pool[index]));
-#else
-  return (boost::get<T>(pool[index]));
-#endif
-}
-
 }

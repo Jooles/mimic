@@ -175,7 +175,25 @@ public:
     u2 name_and_type_index;
   } InvokeDynamic_info;
 
+  typedef variant<const tag,
+                  const Class_info,
+                  const Double_info,
+                  const Fieldref_info,
+                  const Float_info,
+                  const Integer_info,
+                  const InterfaceMethodref_info,
+                  const InvokeDynamic_info,
+                  const Long_info,
+                  const MethodHandle_info,
+                  const MethodType_info,
+                  const Methodref_info,
+                  const NameAndType_info,
+                  const String_info,
+                  const JUtf8String> cp_type;
+
   ConstantPool() {};
+  ConstantPool(std::vector<cp_type> other_pool) : pool(std::move(other_pool)) {};
+
   /**
    * Parses the constant pool entries from a ByteConsumer
    *
@@ -187,23 +205,19 @@ public:
    * @param index the index of the constant pool entry to get
    * @return the constant pool entry at the specified index
    */
-  template <typename T> T& get(const u2 index);
+  template <typename T> T& get(const u2& index) const
+  {
+    if (index >= pool.size() || index < 1)
+      throw std::range_error("Invalid constant pool index");
+#ifdef HAVE_VARIANT
+    return (std::get<T>(pool[index]));
+#else
+    return (boost::get<T>(pool[index]));
+#endif
+  }
+
 private:
-  typedef variant<tag,
-                  Class_info,
-                  Double_info,
-                  Fieldref_info,
-                  Float_info,
-                  Integer_info,
-                  InterfaceMethodref_info,
-                  InvokeDynamic_info,
-                  Long_info,
-                  MethodHandle_info,
-                  MethodType_info,
-                  Methodref_info,
-                  NameAndType_info,
-                  String_info,
-                  JUtf8String> cp_type;
+  friend class ClassValidator;
   std::vector<cp_type> pool;
 };
 

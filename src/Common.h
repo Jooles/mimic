@@ -8,6 +8,7 @@
 #ifndef SRC_MIMIC_COMMON_H_
 #define SRC_MIMIC_COMMON_H_
 
+#include <array>
 #include <cstdint>
 #ifdef HAVE_CXX_FILESYSTEM
 #include <filesystem>
@@ -24,6 +25,7 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <exception>
 #include <vector>
 
 namespace mimic
