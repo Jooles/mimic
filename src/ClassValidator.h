@@ -39,9 +39,11 @@ public:
    * Validates the contents of the provided constant pool
    *
    * @param cp the ConstantPool object to validate
+   * @param major_version The class' major version number
+   * @param minor_version The class' minor version number
    * @throws runtime_error if validation failed
    */
-  static void validateConstantPool(const ConstantPool& cp);
+  static void validateConstantPool(const ConstantPool& cp, u2 major_version, u2 minor_version);
 };
 };
 

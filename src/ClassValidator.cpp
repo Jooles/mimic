@@ -14,7 +14,8 @@ namespace mimic {
 class ConstantPoolVisitor : public boost::static_visitor<void>
 {
 public:
-  ConstantPoolVisitor(const ConstantPool& cp) : cp(cp) {};
+  ConstantPoolVisitor(const ConstantPool& cp, const u2& major_version, const u2& minor_version)
+   : cp(cp), major_version(major_version), minor_version(minor_version) {};
   void operator() (const ConstantPool::tag& invalid) const {};
   void operator() (const ConstantPool::Class_info& info) const
   {
@@ -30,7 +31,7 @@ public:
   }
   void operator() (const ConstantPool::Double_info& info) const
   {
-    std::cout << "double" << std::endl;
+    // Nothing to do
   }
   void operator() (const ConstantPool::Fieldref_info& info) const
   {
@@ -38,11 +39,11 @@ public:
   }
   void operator() (const ConstantPool::Float_info& info) const
   {
-    std::cout << "float" << std::endl;
+    // Nothing to do
   }
   void operator() (const ConstantPool::Integer_info& info) const
   {
-    std::cout << "integer" << std::endl;
+    // Nothing to do
   }
   void operator() (const ConstantPool::InterfaceMethodref_info& info) const
   {
@@ -54,11 +55,63 @@ public:
   }
   void operator() (const ConstantPool::Long_info& info) const
   {
-    std::cout << "long" << std::endl;
+    // Nothing to do
   }
   void operator() (const ConstantPool::MethodHandle_info& info) const
   {
-    std::cout << "methodhandle" << std::endl;
+    if (info.kind > 9 || info.kind < 1)
+      throw std::range_error("Reference kind out of valid range");
+    switch(info.kind)
+    {
+      case ConstantPool::reference_kind::getField:
+      [[fallthrough]]
+      case ConstantPool::reference_kind::getStatic:
+      [[fallthrough]]
+      case ConstantPool::reference_kind::putField:
+      [[fallthrough]]
+      case ConstantPool::reference_kind::putStatic:
+      {
+        if(cp.getType(info.reference_index) != ConstantPool::cp_type_index::cp_fieldref)
+        {
+          throw std::runtime_error("Invalid method handle reference");
+        }
+        break;
+      }
+      case ConstantPool::reference_kind::invokeVirtual:
+      [[fallthrough]]
+      case ConstantPool::reference_kind::newInvokeSpecial:
+      {
+        if(cp.getType(info.reference_index) != ConstantPool::cp_type_index::cp_methodref)
+        {
+          throw std::runtime_error("Invalid method handle reference");
+        }
+        break;
+      }
+      case ConstantPool::reference_kind::invokeStatic:
+      [[fallthrough]]
+      case ConstantPool::reference_kind::invokeSpecial:
+      {
+        switch (cp.getType(info.reference_index))
+        {
+        case ConstantPool::cp_type_index::cp_interfaceMethodref:
+          if (major_version < 52)
+            throw std::runtime_error("Invalid method handle reference");
+          break;
+        case ConstantPool::cp_type_index::cp_methodref:
+          break;
+        default:
+          throw std::runtime_error("Invalid method handle reference");
+        }
+        break;
+      }
+      case ConstantPool::reference_kind::invokeInterface:
+      {
+        if(cp.getType(info.reference_index) != ConstantPool::cp_type_index::cp_interfaceMethodref)
+        {
+          throw std::runtime_error("Invalid method handle reference");
+        }
+      }
+    }
   }
   void operator() (const ConstantPool::MethodType_info& info) const
   {
@@ -74,14 +127,23 @@ public:
   }
   void operator() (const ConstantPool::String_info& info) const
   {
-    std::cout << "string" << std::endl;
+    try
+    {
+      const JUtf8String str = cp.get<const JUtf8String>(info.string_index);
+    }
+    catch (const boost::bad_get& e)
+    {
+      throw std::runtime_error(e.what());
+    }
   }
   void operator() (const JUtf8String& info) const
   {
-    std::cout << "utf8" << std::endl;
+    // Nothing to do. Strings are validated on construction
   }
 private:
   const ConstantPool& cp;
+  const u2 major_version;
+  const u2 minor_version;
 };
 #endif
 
@@ -101,7 +163,7 @@ void ClassValidator::validateUnqualifiedName(const JUtf8String& str)
     throw std::runtime_error("Invalid character in unqualified name");
 }
 
-void ClassValidator::validateConstantPool(const ConstantPool& cp)
+void ClassValidator::validateConstantPool(const ConstantPool& cp, u2 major_version, u2 minor_version)
 {
   for (auto entry : cp.pool)
   {
@@ -115,7 +177,7 @@ void ClassValidator::validateConstantPool(const ConstantPool& cp)
                 //~ static_assert(always_false<T>::value, "non-exhaustive visitor!");
         //~ }, entry);
 #else
-    boost::apply_visitor( ConstantPoolVisitor(cp), entry );
+    boost::apply_visitor( ConstantPoolVisitor(cp, major_version, minor_version), entry );
 #endif
   }
 }

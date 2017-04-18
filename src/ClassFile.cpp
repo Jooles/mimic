@@ -29,7 +29,7 @@ ClassFile::ClassFile(parsing::ByteConsumer& bc)
   constant_pool_count = bc.readU2();
   std::cout << "constant pool count: " << constant_pool_count << std::endl;
   constant_pool = ConstantPool(bc, constant_pool_count);
-  ClassValidator::validateConstantPool(constant_pool);
+  ClassValidator::validateConstantPool(constant_pool, major_version, minor_version);
   flags = static_cast<access_flags>(bc.readU2());
   std::cout << "access flags: " << flags << std::endl;
   this_class = bc.readU2();

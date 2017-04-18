@@ -68,7 +68,7 @@ ConstantPool::ConstantPool(parsing::ByteConsumer& bc, u2 constant_pool_count)
       break;
     }
     case MethodHandle:
-      pool.push_back(MethodHandle_info{bc.readU1(), bc.readU2()});
+      pool.push_back(MethodHandle_info{static_cast<reference_kind>(bc.readU1()), bc.readU2()});
       break;
     case MethodType:
       pool.push_back(MethodType_info{bc.readU2()});

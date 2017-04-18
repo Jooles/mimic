@@ -149,8 +149,8 @@ public:
   /** Representation of a Method Handle entry in the constant pool. */
   typedef struct MethodHandle_info
   {
-    MethodHandle_info(u1 reference_kind, u2 reference_index)
-    : reference_index(reference_index) {
+    MethodHandle_info(reference_kind kind, u2 reference_index)
+    : kind(kind), reference_index(reference_index) {
     }
     reference_kind kind;
     u2 reference_index;
@@ -191,6 +191,25 @@ public:
                   const String_info,
                   const JUtf8String> cp_type;
 
+  enum cp_type_index
+  {
+    cp_tag = 0,
+    cp_class = 1,
+    cp_double = 2,
+    cp_fieldref = 3,
+    cp_float = 4,
+    cp_integer = 5,
+    cp_interfaceMethodref = 6,
+    cp_invokeDynamic = 7,
+    cp_long = 8,
+    cp_methodHandle = 9,
+    cp_methodType = 10,
+    cp_methodref = 11,
+    cp_nameAndType = 12,
+    cp_string = 13,
+    cp_utf8 = 14
+  };
+
   ConstantPool() {};
   ConstantPool(std::vector<cp_type> other_pool) : pool(std::move(other_pool)) {};
 
@@ -201,6 +220,7 @@ public:
    * @param the number of constant pool entries
    */
   ConstantPool(parsing::ByteConsumer&, u2);
+
   /**
    * @param index the index of the constant pool entry to get
    * @return the constant pool entry at the specified index
@@ -213,6 +233,21 @@ public:
     return (std::get<T>(pool[index]));
 #else
     return (boost::get<T>(pool[index]));
+#endif
+  }
+
+  /**
+   * @param index the index of the constant pool entry to get
+   * @return the constant pool type at the specified index
+   */
+  cp_type_index getType(const u2& index) const
+  {
+    if (index >= pool.size() || index < 1)
+      throw std::range_error("Invalid constant pool index");
+#ifdef HAVE_VARIANT
+    return static_cast<cp_type_index>(pool[index].index());
+#else
+    return static_cast<cp_type_index>(pool[index].which());
 #endif
   }
 
