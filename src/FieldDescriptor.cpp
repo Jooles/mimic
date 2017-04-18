@@ -10,7 +10,7 @@
 namespace mimic {
 
 FieldDescriptor::FieldDescriptor(const JUtf8String& str)
-  :array_dimensions(0), descriptor_type(type::jarray)
+  :descriptor_type(type::jarray), array_dimensions(0)
 {
   for (auto i = str.begin(); i != str.end(); ++i)
   {
