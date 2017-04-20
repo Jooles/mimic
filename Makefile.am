@@ -8,6 +8,7 @@ libmimic_a_SOURCES= \
     src/ClassValidator.cpp \
     src/FieldDescriptor.cpp \
     src/JUtf8String.cpp \
+    src/MethodDescriptor.cpp \
     src/parsing/ByteConsumer.cpp
 
 bin_PROGRAMS=mimic
@@ -25,6 +26,7 @@ mimictest_SOURCES=src/test/MimicTest.cpp \
     src/test/ClassValidator_test.cpp \
     src/test/FieldDescriptor_test.cpp \
     src/test/JUtf8String_test.cpp \
+    src/test/MethodDescriptor_test.cpp \
     src/test/parsing/ByteConsumer_test.cpp
 
 test: check

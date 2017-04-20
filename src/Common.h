@@ -15,6 +15,11 @@
 #elif defined(HAVE_CXX_EXPERIMENTAL_FILESYSTEM)
 #include <experimental/filesystem>
 #endif
+#ifdef HAVE_CXX_OPTIONAL
+#include <optional>
+#elif defined(HAVE_CXX_EXPERIMENTAL_OPTIONAL)
+#include <experimental/optional>
+#endif
 #ifdef HAVE_CXX_VARIANT
 #include <variant>
 #else
@@ -39,6 +44,13 @@ namespace fs = std::experimental::filesystem;
 using std::variant;
 #else
 using boost::variant;
+#endif
+#ifdef HAVE_CXX_OPTIONAL
+using std::optional;
+using std::nullopt_t;
+#elif defined(HAVE_CXX_EXPERIMENTAL_OPTIONAL)
+using std::experimental::optional;
+using std::experimental::nullopt_t;
 #endif
 
 /*

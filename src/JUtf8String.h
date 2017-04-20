@@ -99,6 +99,11 @@ public:
     {
       return b < i.b;
     }
+
+    bool operator>=(const JUtf8StringIterator& i) const
+    {
+      return b >= i.b;
+    }
     
     bool operator==(const JUtf8StringIterator& i) const
     {
@@ -244,6 +249,11 @@ public:
       ++otherIter;
     }
     return true;
+  }
+
+  bool operator!=(const JUtf8String& other) const
+  {
+    return !(*this == other);
   }
 
   friend std::ostream& operator<<(std::ostream& os, const JUtf8String& str)

@@ -17,35 +17,35 @@ FieldDescriptor::FieldDescriptor(const JUtf8String& str)
     switch (*i)
     {
       case type::jbyte:
-        className = JUtf8String("byte");
+        class_name = JUtf8String("byte");
         descriptor_type = static_cast<type>(*i);
         break;
       case type::jchar:
-        className = JUtf8String("char");
+        class_name = JUtf8String("char");
         descriptor_type = static_cast<type>(*i);
         break;
       case type::jdouble:
-        className = JUtf8String("double");
+        class_name = JUtf8String("double");
         descriptor_type = static_cast<type>(*i);
         break;
       case type::jfloat:
-        className = JUtf8String("float");
+        class_name = JUtf8String("float");
         descriptor_type = static_cast<type>(*i);
         break;
       case type::jint:
-        className = JUtf8String("int");
+        class_name = JUtf8String("int");
         descriptor_type = static_cast<type>(*i);
         break;
       case type::jlong:
-        className = JUtf8String("long");
+        class_name = JUtf8String("long");
         descriptor_type = static_cast<type>(*i);
         break;
       case type::jshort:
-        className = JUtf8String("short");
+        class_name = JUtf8String("short");
         descriptor_type = static_cast<type>(*i);
         break;
       case type::jboolean:
-        className = JUtf8String("boolean");
+        class_name = JUtf8String("boolean");
         descriptor_type = static_cast<type>(*i);
         break;
       case type::jclass:
@@ -56,7 +56,7 @@ FieldDescriptor::FieldDescriptor(const JUtf8String& str)
           throw parsing::parse_failure("No semicolon after class or interface name");
         if (nameEnd == (i + 1))
           throw parsing::parse_failure("Class name missing");
-        className = JUtf8String(++i, nameEnd);
+        class_name = JUtf8String(++i, nameEnd);
         i = ++nameEnd;
         break;
       }
@@ -76,7 +76,7 @@ FieldDescriptor::FieldDescriptor(const JUtf8String& str)
   {
     ss << "[]";
   }
-  ss >> className;
+  ss >> class_name;
 }
 
 }

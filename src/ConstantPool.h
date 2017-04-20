@@ -9,6 +9,8 @@
 #define SRC_MIMIC_CONSTANTPOOL_H_
 
 #include "Common.h"
+#include "FieldDescriptor.h"
+#include "MethodDescriptor.h"
 #include "JUtf8String.h"
 #include "parsing/ByteConsumer.h"
 
@@ -189,7 +191,9 @@ public:
                   const Methodref_info,
                   const NameAndType_info,
                   const String_info,
-                  const JUtf8String> cp_type;
+                  const JUtf8String,
+                  const FieldDescriptor,
+                  const MethodDescriptor> cp_type;
 
   enum cp_type_index
   {
@@ -207,7 +211,9 @@ public:
     cp_methodref = 11,
     cp_nameAndType = 12,
     cp_string = 13,
-    cp_utf8 = 14
+    cp_utf8 = 14,
+    cp_fieldDescriptor = 15,
+    cp_methodDescriptor = 16
   };
 
   ConstantPool() {};

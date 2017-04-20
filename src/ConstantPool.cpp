@@ -64,7 +64,22 @@ ConstantPool::ConstantPool(parsing::ByteConsumer& bc, u2 constant_pool_count)
     case Utf8:
     {
       u2 numberOfBytes = bc.readU2();
-      pool.push_back(JUtf8String(bc.readBytes(numberOfBytes)));
+      JUtf8String str(bc.readBytes(numberOfBytes));
+      try
+      {
+        pool.push_back(FieldDescriptor(str));
+      }
+      catch (const std::exception&)
+      {
+        try
+        {
+          pool.push_back(MethodDescriptor(str));
+        }
+        catch (const std::exception&)
+        {
+          pool.push_back(str);
+        }
+      }
       break;
     }
     case MethodHandle:

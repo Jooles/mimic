@@ -51,7 +51,7 @@ TEST_F(ClassValidatorTest, TestClassInfoInvalidUnqualifiedClassName)
 
 TEST_F(ClassValidatorTest, TestClassInfoValidArrayDescriptor)
 {
-  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid, ConstantPool::Class_info(2), JUtf8String("[[J")});
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid, ConstantPool::Class_info(2), FieldDescriptor(JUtf8String("[[J"))});
 	ASSERT_NO_THROW(ClassValidator::validateConstantPool(cp, 52, 0));
 }
 
@@ -253,4 +253,33 @@ TEST_F(ClassValidatorTest, TestMethodHandleInfoValidPutStatic)
 	ASSERT_NO_THROW(ClassValidator::validateConstantPool(cp, 52, 0));
 }
 
+TEST_F(ClassValidatorTest, TestMethodTypeInfoMissingUtf8)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid, ConstantPool::MethodType_info(2)});
+	ASSERT_THROW(ClassValidator::validateConstantPool(cp, 52, 0), std::runtime_error);
+}
+
+TEST_F(ClassValidatorTest, TestMethodTypeInfoWrongUtf8Index)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid, ConstantPool::MethodType_info(2), ConstantPool::Integer_info(1234)});
+	ASSERT_THROW(ClassValidator::validateConstantPool(cp, 52, 0), std::runtime_error);
+}
+
+TEST_F(ClassValidatorTest, TestMethodTypeInfoInvalidClassName)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid, ConstantPool::MethodType_info(2), JUtf8String("wib.ble")});
+	ASSERT_THROW(ClassValidator::validateConstantPool(cp, 52, 0), std::runtime_error);
+}
+
+TEST_F(ClassValidatorTest, TestMethodTypeInfoInvalidUnqualifiedClassName)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid, ConstantPool::MethodType_info(2), JUtf8String("w/ib/bl/;e")});
+	ASSERT_THROW(ClassValidator::validateConstantPool(cp, 52, 0), std::runtime_error);
+}
+
+TEST_F(ClassValidatorTest, TestMethodTypeInfoValidArrayDescriptor)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid, ConstantPool::MethodType_info(2), MethodDescriptor(JUtf8String("()[[J"))});
+	ASSERT_NO_THROW(ClassValidator::validateConstantPool(cp, 52, 0));
+}
 }

@@ -18,6 +18,8 @@ m4_include([m4/ax_cxx_have_filesystem.m4])
 AX_CXX_HAVE_FILESYSTEM
 m4_include([m4/ax_cxx_have_variant.m4])
 AX_CXX_HAVE_VARIANT
+m4_include([m4/ax_cxx_have_optional.m4])
+AX_CXX_HAVE_OPTIONAL
 
 m4_include([m4/ax_boost_base.m4])
 AX_BOOST_BASE([1.52])

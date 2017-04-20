@@ -164,4 +164,8 @@ TEST_F(FieldDescriptorTest, TestClassArray)
   ASSERT_EQ(JUtf8String("java/lang/String[][]"), descriptor.getClassName());
 }
 
+TEST_F(FieldDescriptorTest, TestEquals)
+{
+  ASSERT_EQ(FieldDescriptor(JUtf8String("Z")), FieldDescriptor(JUtf8String("Z")));
+}
 }

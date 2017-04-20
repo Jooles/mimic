@@ -14,20 +14,16 @@ namespace mimic {
 class ConstantPoolVisitor : public boost::static_visitor<void>
 {
 public:
-  ConstantPoolVisitor(const ConstantPool& cp, const u2& major_version, const u2& minor_version)
+  ConstantPoolVisitor(ConstantPool& cp, const u2 major_version, const u2 minor_version)
    : cp(cp), major_version(major_version), minor_version(minor_version) {};
   void operator() (const ConstantPool::tag& invalid) const {};
   void operator() (const ConstantPool::Class_info& info) const
   {
-    try
-    {
-      const JUtf8String str = cp.get<const JUtf8String>(info.name_index);
-      ClassValidator::validateClassOrInterfaceName(str);
-    }
-    catch (const boost::bad_get& e)
-    {
-      throw std::runtime_error(e.what());
-    }
+    auto nameType = cp.getType(info.name_index);
+    if (nameType == ConstantPool::cp_type_index::cp_utf8)
+      ClassValidator::validateClassOrInterfaceName(cp.get<const JUtf8String>(info.name_index));
+    else if (nameType != ConstantPool::cp_type_index::cp_fieldDescriptor)
+      throw std::runtime_error("Invalid  name reference");
   }
   void operator() (const ConstantPool::Double_info& info) const
   {
@@ -115,7 +111,8 @@ public:
   }
   void operator() (const ConstantPool::MethodType_info& info) const
   {
-    std::cout << "methodtype" << std::endl;
+    if (cp.getType(info.descriptor_index) != ConstantPool::cp_type_index::cp_methodDescriptor)
+      throw std::runtime_error("Invalid  name reference");
   }
   void operator() (const ConstantPool::Methodref_info& info) const
   {
@@ -127,27 +124,24 @@ public:
   }
   void operator() (const ConstantPool::String_info& info) const
   {
-    try
+    if(cp.getType(info.string_index) != ConstantPool::cp_type_index::cp_utf8)
     {
-      const JUtf8String str = cp.get<const JUtf8String>(info.string_index);
-    }
-    catch (const boost::bad_get& e)
-    {
-      throw std::runtime_error(e.what());
+      throw std::runtime_error("Invalid string reference");
     }
   }
   void operator() (const JUtf8String& info) const
   {
     // Nothing to do. Strings are validated on construction
   }
+  template <typename T> void operator() (const T&) const {}
 private:
-  const ConstantPool& cp;
+  ConstantPool& cp;
   const u2 major_version;
   const u2 minor_version;
 };
 #endif
 
-void ClassValidator::validateClassOrInterfaceName(const JUtf8String& str)
+void ClassValidator::validateClassOrInterfaceName(const JUtf8String str)
 {
   if (str.contains(JUtf8String(".")))
     throw std::runtime_error("Invalid character in class or identifier name");
@@ -156,14 +150,13 @@ void ClassValidator::validateClassOrInterfaceName(const JUtf8String& str)
     validateUnqualifiedName(*i);
 }
 
-void ClassValidator::validateUnqualifiedName(const JUtf8String& str)
+void ClassValidator::validateUnqualifiedName(const JUtf8String str)
 {
-  if (!(*str.begin() == '[' && FieldDescriptor::isValidDescriptor(str))
-      && str.contains(std::vector<JUtf8String>{JUtf8String("."), JUtf8String(";"), JUtf8String("["), JUtf8String("/")}))
+  if (str.contains(std::vector<JUtf8String>{JUtf8String("."), JUtf8String(";"), JUtf8String("["), JUtf8String("/")}))
     throw std::runtime_error("Invalid character in unqualified name");
 }
 
-void ClassValidator::validateConstantPool(const ConstantPool& cp, u2 major_version, u2 minor_version)
+void ClassValidator::validateConstantPool(ConstantPool& cp, u2 major_version, u2 minor_version)
 {
   for (auto entry : cp.pool)
   {

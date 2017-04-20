@@ -297,6 +297,15 @@ TEST_F(JUtf8StringTest, TestIteratorPlusEquals)
   ASSERT_EQ(static_cast<u4>('r'), *iter);
 }
 
+TEST_F(JUtf8StringTest, TestIteratorGreaterThanOrEqualTo)
+{
+  JUtf8String str("bar");
+  auto iter = str.begin();
+  ASSERT_TRUE(iter + 1  >= iter);
+  ASSERT_TRUE(iter >= iter);
+  ASSERT_FALSE(iter >= iter + 1);
+}
+
 TEST_F(JUtf8StringTest, TestConstructFromRange)
 {
   JUtf8String str("foobar");
@@ -395,5 +404,10 @@ TEST_F(JUtf8StringTest, TestSplitNotFound)
   auto actual = str.split(JUtf8String("bar"));
   ASSERT_EQ(1u, actual.size());
   ASSERT_EQ(expected[0], actual[0]);
+}
+
+TEST_F(JUtf8StringTest, TestNotEqual)
+{
+  ASSERT_NE(JUtf8String("foo"), JUtf8String("bar"));
 }
 }

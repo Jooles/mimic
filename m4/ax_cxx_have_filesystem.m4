@@ -45,7 +45,7 @@ AC_DEFUN([AX_CXX_HAVE_FILESYSTEM],
         [Define if filesystem defines the std::filesystem::path class.])
     fi
   AC_CACHE_CHECK(
-    [for std::experimental::filesystem::path in filesystem],
+    [for std::experimental::filesystem::path in experimental/filesystem],
     ax_cv_cxx_have_experimental_filesystem,
     [dnl
       AC_LANG_PUSH([C++])

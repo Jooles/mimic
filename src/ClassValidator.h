@@ -23,7 +23,7 @@ public:
    * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.2.1
    * @param str The string representation of the class or interface name
    */
-  static void validateClassOrInterfaceName(const JUtf8String& str);
+  static void validateClassOrInterfaceName(const JUtf8String str);
 
   /**
    * Checks that the given unqualified name does not contain any of the
@@ -33,7 +33,7 @@ public:
    * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.2.2
    * @param str The string representation of the unqualified identifier
    */
-  static void validateUnqualifiedName(const JUtf8String& str);
+  static void validateUnqualifiedName(const JUtf8String str);
 
   /**
    * Validates the contents of the provided constant pool
@@ -43,7 +43,7 @@ public:
    * @param minor_version The class' minor version number
    * @throws runtime_error if validation failed
    */
-  static void validateConstantPool(const ConstantPool& cp, u2 major_version, u2 minor_version);
+  static void validateConstantPool(ConstantPool& cp, u2 major_version, u2 minor_version);
 };
 };
 
