@@ -57,8 +57,8 @@ TEST_F(JUtf8StringTest, TestTwoByteCharacterGivesLength1)
     u1 byte1 = ((i >> 6) & 0x1f) | 0xc0;
     u1 byte2 = (i & 0x3f) | 0x80;
     std::vector<u1> bytes = { byte1, byte2 };
-    ASSERT_EQ(2, bytes.size());
-    ASSERT_EQ(1, JUtf8String(bytes).length());
+    ASSERT_EQ(2u, bytes.size());
+    ASSERT_EQ(1u, JUtf8String(bytes).length());
   }
 }
 
@@ -69,8 +69,8 @@ TEST_F(JUtf8StringTest, TestThreeByteCharacterGivesLength1)
     u1 byte2 = ((i >> 6) & 0x3f) | 0x80;
     u1 byte3 = (i & 0x3f) | 0x80;
     std::vector<u1> bytes = { byte1, byte2, byte3 };
-    ASSERT_EQ(3, bytes.size());
-    ASSERT_EQ(1, JUtf8String(bytes).length());
+    ASSERT_EQ(3u, bytes.size());
+    ASSERT_EQ(1u, JUtf8String(bytes).length());
   }
 }
 
@@ -84,8 +84,8 @@ TEST_F(JUtf8StringTest, Test6ByteCharacterGivesLength1)
     u1 byte5 = ((i >> 6) & 0x0f) | 0xb0;
     u1 byte6 = (i & 0x3f) | 0x80;
     std::vector<u1> bytes = { byte1, byte2, byte3, byte4, byte5, byte6 };
-    ASSERT_EQ(6, bytes.size());
-    ASSERT_EQ(1, JUtf8String(bytes).length());
+    ASSERT_EQ(6u, bytes.size());
+    ASSERT_EQ(1u, JUtf8String(bytes).length());
   }
 }
 
@@ -283,18 +283,18 @@ TEST_F(JUtf8StringTest, TestIteratorPlus)
 {
   JUtf8String str("foo");
   auto iter = str.begin();
-  ASSERT_EQ('f', *iter);
-  ASSERT_EQ('o', *(iter + 2));
-  ASSERT_EQ('f', *iter);
+  ASSERT_EQ(static_cast<u4>('f'), *iter);
+  ASSERT_EQ(static_cast<u4>('o'), *(iter + 2));
+  ASSERT_EQ(static_cast<u4>('f'), *iter);
 }
 
 TEST_F(JUtf8StringTest, TestIteratorPlusEquals)
 {
   JUtf8String str("bar");
   auto iter = str.begin();
-  ASSERT_EQ('b', *iter);
-  ASSERT_EQ('r', *(iter += 2));
-  ASSERT_EQ('r', *iter);
+  ASSERT_EQ(static_cast<u4>('b'), *iter);
+  ASSERT_EQ(static_cast<u4>('r'), *(iter += 2));
+  ASSERT_EQ(static_cast<u4>('r'), *iter);
 }
 
 TEST_F(JUtf8StringTest, TestConstructFromRange)
@@ -362,7 +362,7 @@ TEST_F(JUtf8StringTest, TestSplitCharacterInMiddle)
   JUtf8String str("foobarbat");
   std::vector<JUtf8String> expected = {JUtf8String("fooba"), JUtf8String("bat")};
   auto actual = str.split(JUtf8String("r"));
-  ASSERT_EQ(2, actual.size());
+  ASSERT_EQ(2u, actual.size());
   ASSERT_EQ(expected[0], actual[0]);
   ASSERT_EQ(expected[1], actual[1]);
 }
@@ -372,7 +372,7 @@ TEST_F(JUtf8StringTest, TestSplitStringInMiddle)
   JUtf8String str("foobarbat");
   std::vector<JUtf8String> expected = {JUtf8String("foo"), JUtf8String("bat")};
   auto actual = str.split(JUtf8String("bar"));
-  ASSERT_EQ(2, actual.size());
+  ASSERT_EQ(2u, actual.size());
   ASSERT_EQ(expected[0], actual[0]);
   ASSERT_EQ(expected[1], actual[1]);
 }
@@ -382,9 +382,18 @@ TEST_F(JUtf8StringTest, TestSplitEmptyDelimiter)
   JUtf8String str("foo");
   std::vector<JUtf8String> expected = {JUtf8String("f"), JUtf8String("o"), JUtf8String("o")};
   auto actual = str.split(JUtf8String(""));
-  ASSERT_EQ(3, actual.size());
+  ASSERT_EQ(3u, actual.size());
   ASSERT_EQ(expected[0], actual[0]);
   ASSERT_EQ(expected[1], actual[1]);
   ASSERT_EQ(expected[2], actual[2]);
+}
+
+TEST_F(JUtf8StringTest, TestSplitNotFound)
+{
+  JUtf8String str("foo");
+  std::vector<JUtf8String> expected = {str};
+  auto actual = str.split(JUtf8String("bar"));
+  ASSERT_EQ(1u, actual.size());
+  ASSERT_EQ(expected[0], actual[0]);
 }
 }
