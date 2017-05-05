@@ -142,7 +142,7 @@ public:
   typedef struct NameAndType_info
   {
     NameAndType_info(u2 name_index, u2 descriptor_index)
-    : descriptor_index(descriptor_index) {
+    : name_index(name_index), descriptor_index(descriptor_index) {
     }
     u2 name_index;
     u2 descriptor_index;
@@ -249,7 +249,11 @@ public:
   cp_type_index getType(const u2& index) const
   {
     if (index >= pool.size() || index < 1)
-      throw std::range_error("Invalid constant pool index");
+    {
+      std::stringstream ss;
+      ss << "Invalid constant pool index " << index;
+      throw std::range_error(ss.str().c_str());
+    }
 #ifdef HAVE_VARIANT
     return static_cast<cp_type_index>(pool[index].index());
 #else

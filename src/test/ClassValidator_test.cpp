@@ -282,4 +282,64 @@ TEST_F(ClassValidatorTest, TestMethodTypeInfoValidArrayDescriptor)
   ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid, ConstantPool::MethodType_info(2), MethodDescriptor(JUtf8String("()[[J"))});
 	ASSERT_NO_THROW(ClassValidator::validateConstantPool(cp, 52, 0));
 }
+
+TEST_F(ClassValidatorTest, TestInvokeDynamicInfoMissingNameAndType)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid, ConstantPool::InvokeDynamic_info(3, 2)});
+	ASSERT_THROW(ClassValidator::validateConstantPool(cp, 52, 0), std::runtime_error);
+}
+
+TEST_F(ClassValidatorTest, TestInvokeDynamicInfoValid)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid,
+                                                     ConstantPool::InvokeDynamic_info(3, 2),
+                                                     ConstantPool::NameAndType_info(4, 5),
+                                                     ConstantPool::tag::Invalid,
+                                                     JUtf8String("Foo"),
+                                                     FieldDescriptor(JUtf8String("C"))});
+	ASSERT_NO_THROW(ClassValidator::validateConstantPool(cp, 52, 0));
+}
+
+TEST_F(ClassValidatorTest, TestNameAndTypeInfoMissingName)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid,
+                                                     ConstantPool::NameAndType_info(3, 2),
+                                                     FieldDescriptor(JUtf8String("B"))});
+	ASSERT_THROW(ClassValidator::validateConstantPool(cp, 52, 0), std::runtime_error);
+}
+
+TEST_F(ClassValidatorTest, TestNameAndTypeInfoMissingDescriptor)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid,
+                                                     ConstantPool::NameAndType_info(2, 3),
+                                                     JUtf8String("Foo")});
+	ASSERT_THROW(ClassValidator::validateConstantPool(cp, 52, 0), std::runtime_error);
+}
+
+TEST_F(ClassValidatorTest, TestNameAndTypeInfoInvalidName)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid,
+                                                     ConstantPool::NameAndType_info(2, 3),
+                                                     FieldDescriptor(JUtf8String("B")),
+                                                     FieldDescriptor(JUtf8String("B"))});
+	ASSERT_THROW(ClassValidator::validateConstantPool(cp, 52, 0), std::runtime_error);
+}
+
+TEST_F(ClassValidatorTest, TestNameAndTypeInfoInvalidDescriptor)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid,
+                                                     ConstantPool::NameAndType_info(2, 3),
+                                                     JUtf8String("Foo"),
+                                                     JUtf8String("Foo")});
+	ASSERT_THROW(ClassValidator::validateConstantPool(cp, 52, 0), std::runtime_error);
+}
+
+TEST_F(ClassValidatorTest, TestNameAndTypeInfoValid)
+{
+  ConstantPool cp(std::vector<ConstantPool::cp_type>{ConstantPool::tag::Invalid,
+                                                     ConstantPool::NameAndType_info(2, 3),
+                                                     JUtf8String("Foo"),
+                                                     FieldDescriptor(JUtf8String("B"))});
+	ASSERT_NO_THROW(ClassValidator::validateConstantPool(cp, 52, 0));
+}
 }

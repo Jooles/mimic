@@ -47,7 +47,9 @@ public:
   }
   void operator() (const ConstantPool::InvokeDynamic_info& info) const
   {
-    std::cout << "invokedynamic" << std::endl;
+    // TODO: Validate the bootstrap method index once attributes are done
+    if (cp.getType(info.name_and_type_index) != ConstantPool::cp_type_index::cp_nameAndType)
+      throw std::runtime_error("Invalid name & type index");
   }
   void operator() (const ConstantPool::Long_info& info) const
   {
@@ -112,7 +114,7 @@ public:
   void operator() (const ConstantPool::MethodType_info& info) const
   {
     if (cp.getType(info.descriptor_index) != ConstantPool::cp_type_index::cp_methodDescriptor)
-      throw std::runtime_error("Invalid  name reference");
+      throw std::runtime_error("Invalid name reference");
   }
   void operator() (const ConstantPool::Methodref_info& info) const
   {
@@ -120,7 +122,13 @@ public:
   }
   void operator() (const ConstantPool::NameAndType_info& info) const
   {
-    std::cout << "nameandtype" << std::endl;
+    auto name_type = cp.getType(info.name_index);
+    auto descriptor_type = cp.getType(info.descriptor_index);
+    if (descriptor_type != ConstantPool::cp_type_index::cp_methodDescriptor
+        && descriptor_type != ConstantPool::cp_type_index::cp_fieldDescriptor)
+      throw std::runtime_error("Invalid descriptor reference");
+    if (name_type != ConstantPool::cp_type_index::cp_utf8)
+      throw std::runtime_error("Invalid name reference");
   }
   void operator() (const ConstantPool::String_info& info) const
   {
